@@ -32,7 +32,19 @@ async function init() {
   $('diffPlat').addEventListener('change', loadDifficulty);
 
   await loadAll();
+  await loadToday();
   pollStatus();
+  // 打开页面后后台静默同步（不打断用户）
+  setTimeout(() => {
+    api('/settings', { silent: true }).then(async (settings) => {
+      const platforms = settings.platforms;
+      for (const [pf, users] of Object.entries(platforms)) {
+        for (const u of users) {
+          try { await api('/sync', { method: 'POST', body: { platform: pf, handle: u.handle }, silent: true }); } catch {}
+        }
+      }
+    }).catch(() => {});
+  }, 1500);
 }
 
 async function loadAll() {
@@ -200,9 +212,7 @@ async function loadDifficulty() {
 
 // ---------- 近期 AC ----------
 async function loadRecent() {
-  const platforms = (await api('/settings')).platforms;
-  const pf = platforms.atcoder.length ? $('ratingPlat') && 'codeforces' : 'codeforces';
-  const data = await api(`/recent?platform=${pf}&n=16`);
+  const data = await api('/recent?platform=all&n=16');
   const list = $('recentList');
   const note = $('recentNote');
   if (!data.length) {
@@ -210,15 +220,42 @@ async function loadRecent() {
     note.textContent = '';
     return;
   }
-  list.innerHTML = `<table><thead><tr><th>时间</th><th>题号</th><th>标题</th><th>难度</th><th></th></tr></thead><tbody>
+  list.innerHTML = `<table><thead><tr><th>时间</th><th>平台</th><th>题号</th><th>标题</th><th>难度</th><th>标签</th></tr></thead><tbody>
     ${data.map((r) => `<tr>
       <td class="small muted">${fmtTs(r.ts)}</td>
+      <td>${PLATFORM[r.platform]?.short || r.platform}</td>
       <td class="mono"><a href="${esc(r.url)}" target="_blank">${esc(r.pid)}</a></td>
       <td>${esc(r.name)}</td>
-      <td class="num">${ratingLabel(pf, r.rating)}</td>
+      <td class="num">${ratingLabel(r.platform, r.rating)}</td>
       <td class="small muted">${esc(r.tags.slice(0, 3).join('、'))}</td>
     </tr>`).join('')}</tbody></table>`;
-  note.textContent = `平台 ${PLATFORM[pf]?.name}，最近 ${data.length} 条。`;
+  note.textContent = `全平台最近 ${data.length} 条 AC。`;
+}
+
+// ---------- 今日任务 ----------
+async function loadToday() {
+  const box = $('todayList');
+  if (!box) return;
+  try {
+    const items = await api('/plan/today', { silent: true });
+    if (!items.length) {
+      box.innerHTML = '<div class="muted small">今天没有待办题目。去「训练计划」生成一份计划吧。</div>';
+      return;
+    }
+    box.innerHTML = `<div class="muted small mb">共 ${items.length} 道待完成（含逾期）</div>` +
+      items.map((it) => {
+        const overdue = it.scheduled_date < todayStr();
+        return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span class="src" style="background:${PLATFORM[it.platform]?.color}22;color:${PLATFORM[it.platform]?.color};padding:2px 8px;border-radius:4px;font-size:12px">${PLATFORM[it.platform]?.short || it.platform}</span>
+          <a href="${esc(it.url || '#')}" target="_blank" class="mono" style="min-width:80px">${esc(it.pid)}</a>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.name || '')}</span>
+          <span class="tag">${ratingLabel(it.platform, it.rating)}</span>
+          ${overdue ? '<span class="badge warn">逾期 ' + it.scheduled_date.slice(5) + '</span>' : ''}
+        </div>`;
+      }).join('');
+  } catch {
+    box.innerHTML = '';
+  }
 }
 
 // ---------- 数据源状态 ----------

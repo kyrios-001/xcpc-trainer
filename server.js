@@ -71,6 +71,12 @@ async function readBody(req, maxBytes = 1024 * 1024) {
 }
 class BodyTooLargeError extends Error {}
 
+function todayStr() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 // ---------- 后台任务执行器（带超时与失败详情） ----------
 const running = new Map();
 const taskErrors = new Map();   // key -> 最近一次失败信息（供状态接口展示）
@@ -423,6 +429,28 @@ const server = http.createServer(async (req, res) => {
       plan.setPlanItemStatus(USER, b.platform, b.pid, b.status, b.note);
       return json(res, { ok: true });
     }
+    if (p === '/api/plan/today' && req.method === 'GET') {
+      const rows = dbm.db.prepare(
+        "SELECT * FROM plan_items WHERE user = ? AND scheduled_date <= ? AND status != 'done' ORDER BY scheduled_date, id LIMIT 50"
+      ).all(USER, todayStr());
+      return json(res, rows.map((r) => ({ ...r, tags: JSON.parse(r.tags || '[]') })));
+    }
+    if (p === '/api/plan/reschedule' && req.method === 'POST') {
+      const existing = dbm.db.prepare("SELECT * FROM plan_items WHERE user = ? ORDER BY id").all(USER);
+      if (!existing.length) return fail(res, '还没有计划', 400);
+      const metaRaw = dbm.getSetting(`plan_meta_${USER}`, null);
+      if (!metaRaw) return fail(res, '计划元数据缺失', 400);
+      const meta = JSON.parse(metaRaw);
+      const items = existing.map((r) => ({ ...r, tags: JSON.parse(r.tags || '[]') }));
+      const rescheduled = plan.rescheduleItems(items, meta.weekly || 12, meta.restDays || [], USER);
+      dbm.db.exec('BEGIN');
+      try {
+        const upd = dbm.db.prepare("UPDATE plan_items SET scheduled_date = ? WHERE user = ? AND platform = ? AND pid = ?");
+        for (const it of rescheduled) upd.run(it.scheduled_date, USER, it.platform, it.pid);
+        dbm.db.exec('COMMIT');
+      } catch (e) { dbm.db.exec('ROLLBACK'); throw e; }
+      return json(res, { rescheduled: rescheduled.length });
+    }
     if (p === '/api/busy' && req.method === 'GET') return json(res, plan.listBusyDays(USER));
     if (p === '/api/busy' && req.method === 'POST') {
       const b = await readBody(req);
@@ -542,8 +570,17 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === '/api/lists' && req.method === 'GET') {
+      const doneSet = new Set();
+      for (const r of dbm.db.prepare("SELECT platform, pid FROM submissions WHERE verdict = 'OK'").all()) doneSet.add(r.platform + ':' + r.pid);
+      for (const r of dbm.db.prepare("SELECT platform, pid FROM solved_marks WHERE user = ?").all(USER)) doneSet.add(r.platform + ':' + r.pid);
       const rows = dbm.db.prepare('SELECT * FROM lists WHERE user = ? ORDER BY id DESC').all(USER);
-      return json(res, rows.map((r) => ({ ...r, problems: JSON.parse(r.problems || '[]') })));
+      const result = rows.map(function(r) {
+        const probs = JSON.parse(r.problems || '[]').map(function(p) {
+          return Object.assign({}, p, { done: doneSet.has(p.platform + ':' + p.pid) });
+        });
+        return Object.assign({}, r, { problems: probs });
+      });
+      return json(res, result);
     }
     if (p === '/api/lists' && req.method === 'POST') {
       const b = await readBody(req);

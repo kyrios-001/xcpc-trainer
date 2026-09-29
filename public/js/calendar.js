@@ -234,18 +234,42 @@ async function loadHistory() {
   }));
 }
 
-// ---------- 轮询刷新赛内状态 ----------
+// ---------- 倒计时本地跳动 + 定期同步 ----------
+let localTimer = null;
+function tickTimer() {
+  if (!activeSession || activeSession.status === 'finished') return;
+  const t = activeSession.timing || {};
+  if (activeSession.status === 'countdown' && t.remaining != null) {
+    t.remaining = Math.max(0, t.remaining - 1);
+    // 只更新数字，不重渲染整个页面
+    const el = document.querySelector('.timer');
+    if (el) el.innerHTML = fmtCountdown(t.remaining) + ' <small>倒计时</small>';
+    if (t.remaining <= 0) {
+      activeSession = { ...activeSession, status: 'running' };
+      renderActive();
+      startPollSync();
+    }
+  } else if ((activeSession.status === 'running' || activeSession.status === 'paused') && t.elapsed != null) {
+    if (activeSession.status === 'running') t.elapsed++;
+    const el = document.querySelector('.timer');
+    if (el) el.innerHTML = fmtCountdown(t.elapsed) + ' <small>' + (activeSession.status === 'paused' ? '已暂停' : '进行中') + '</small>';
+  }
+}
+function startPollSync() {
+  if (localTimer) clearInterval(localTimer);
+  localTimer = setInterval(tickTimer, 1000);
+}
 async function pollActive() {
   if (!activeSession || activeSession.status === 'finished') return;
   const s = await api(`/virtual?session=${activeSession.id}`, { silent: true }).catch(() => null);
   if (s) {
     const prevStatus = activeSession.status;
     activeSession = s;
-    // 倒计时归零自动翻转为 running
     if (prevStatus === 'countdown' && s.timing && s.timing.remaining <= 0) {
       activeSession = { ...s, status: 'running' };
     }
     renderActive();
+    startPollSync();
   }
 }
 setInterval(pollActive, 15000);

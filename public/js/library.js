@@ -133,7 +133,7 @@ async function loadLists() {
         <button class="btn sm danger" data-del="${l.id}">删除</button>
       </div>
       <div class="mt">${l.problems.map((p) =>
-        `<span class="tag ${p.done ? '' : 'hot'}"><a href="${esc(p.url || '#')}" target="_blank">${PLATFORM[p.platform]?.short || p.platform}:${esc(p.pid)}</a>${p.name ? ' · ' + esc(p.name) : ''}</span>`).join('') || '<span class="muted small">空题单</span>'}</div>
+        `<span class="tag ${p.done ? 'done-prob' : 'hot'}" style="${p.done ? 'opacity:.5;text-decoration:line-through' : ''}"><a href="${esc(p.url || '#')}" target="_blank">${PLATFORM[p.platform]?.short || p.platform}:${esc(p.pid)}</a>${p.name ? ' · ' + esc(p.name) : ''}</span>`).join('') || '<span class="muted small">空题单</span>'}</div>
     </div>`;
   }).join('');
   box.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {

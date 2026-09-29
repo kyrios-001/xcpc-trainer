@@ -27,7 +27,14 @@ async function init() {
   $('pMixLg').checked = s.planDefaults.mixLuogu;
 
   $('btnGen').addEventListener('click', generate);
-  $('btnRegen').addEventListener('click', () => generate(true));
+  $('btnRegen').addEventListener('click', async () => {
+    try {
+      await api('/plan/reschedule', { method: 'POST', body: {} });
+      flash('已按当前日期重新排程');
+      await loadBusy();
+      await loadPlan();
+    } catch (e) { flash(e.message, 'err'); }
+  });
   $('btnPrev').addEventListener('click', () => { weekOffset--; renderWeek(); });
   $('btnNext').addEventListener('click', () => { weekOffset++; renderWeek(); });
   $('btnToday').addEventListener('click', () => { weekOffset = 0; renderWeek(); });
