@@ -61,12 +61,12 @@ async function loadSync() {
     return;
   }
   box.innerHTML = rows.map(({ pf, u, st }) => `
-    <div class="row" style="justify-content:space-between;border-bottom:1px solid var(--border);padding:10px 0">
-      <div>
-        <b>${PLATFORM[pf]?.name}</b> <span class="mono">${esc(u.handle)}</span>
-        <span class="small muted">${st && st.status === 'ok' ? `上次同步 ${fmtTs(st.last_sync)}` : st && st.status === 'error' ? `错误：${esc(st.error)}` : '未同步'}</span>
+    <div style="display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid var(--border);padding:10px 0">
+      <div style="flex:1;min-width:0">
+        <div><b>${PLATFORM[pf]?.name}</b> <span class="mono">${esc(u.handle)}</span></div>
+        <div class="small muted" style="margin-top:4px;line-height:1.5;word-break:break-word;white-space:normal">${st && st.status === 'ok' ? `上次同步 ${fmtTs(st.last_sync)}` : st && st.status === 'error' ? `<span style="color:#c0392b">错误：${esc(st.error)}</span>` : '未同步'}</div>
       </div>
-      <div class="row">
+      <div class="row" style="flex-shrink:0;gap:6px">
         <button class="btn sm" data-sync="${pf}:${u.handle}:latest">同步最新</button>
         <button class="btn sm" data-sync="${pf}:${u.handle}:full">重新同步全部</button>
         <button class="btn sm danger" data-clear="${pf}:${u.handle}">清空单站</button>
