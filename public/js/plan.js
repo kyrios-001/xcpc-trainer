@@ -99,8 +99,7 @@ async function loadBusy() {
 
 async function loadPlan() {
   const r = await api('/plan');
-  planData = planData || { meta: r.meta, items: r.items };
-  planData.items = r.items;
+  planData = { meta: typeof r.meta === 'string' ? JSON.parse(r.meta) : r.meta, items: r.items };
   renderWeek();
   renderStages();
 }
