@@ -58,13 +58,6 @@ async function init() {
     await loadSync();
   }));
 
-  $('btnClearAll').addEventListener('click', async () => {
-    if (!confirm('确定清空所有 OJ 的同步数据？账号设置会保留。')) return;
-    await api('/sync/clear', { method: 'POST', body: { all: true } });
-    flash('已清空');
-    await loadSync();
-  });
-
   await Promise.all([loadSync(), loadTiers(), loadModel()]);
 }
 
@@ -89,8 +82,6 @@ async function loadSync() {
       </div>
       <div class="row" style="flex-shrink:0;gap:6px">
         <button class="btn sm" data-sync="${pf}:${u.handle}:latest">同步最新</button>
-        <button class="btn sm" data-sync="${pf}:${u.handle}:full">重新同步全部</button>
-        <button class="btn sm danger" data-clear="${pf}:${u.handle}">清空单站</button>
         <button class="btn sm danger" data-del="${pf}:${u.handle}" title="删除此账号及其所有同步数据">删除账号</button>
       </div>
     </div>`).join('');
@@ -102,13 +93,6 @@ async function loadSync() {
       flash(`${PLATFORM[pf]?.name} 同步已启动，完成后自动更新状态`);
       pollUntilIdle();
     } catch (e) { flash(e.message, 'err'); b.disabled = false; }
-  }));
-  box.querySelectorAll('[data-clear]').forEach((b) => b.addEventListener('click', async () => {
-    const [pf, handle] = b.dataset.clear.split(':');
-    if (!confirm(`清空 ${PLATFORM[pf]?.name}（${handle}）的同步数据？账号设置保留。`)) return;
-    await api('/sync/clear', { method: 'POST', body: { platform: pf } });
-    flash('已清空该站数据');
-    loadSync();
   }));
   box.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
     const [pf, handle] = b.dataset.del.split(':');
