@@ -14,6 +14,7 @@ const cf = require('./lib/cf');
 const ac = require('./lib/ac');
 const luogu = require('./lib/luogu');
 const leetcode = require('./lib/leetcode');
+const simpleOj = require('./lib/simple_oj');
 const plan = require('./lib/plan');
 const contests = require('./lib/contests');
 const icpc = require('./lib/icpc');
@@ -148,6 +149,14 @@ async function syncPlatform(platform, handle, mode) {
       dbm.checkpoint();
       return { solved: r.solved, ranking: r.ranking };
     }
+    if (simpleOj.handlers[platform]) {
+      const r = await simpleOj.handlers[platform](handle);
+      dbm.setSyncState(platform, handle, {
+        cursor: '', last_sync: Math.floor(Date.now() / 1000), status: 'ok', error: '',
+      });
+      dbm.checkpoint();
+      return r;
+    }
     throw new Error('未知平台');
   } catch (e) {
     dbm.setSyncState(platform, handle, {
@@ -166,7 +175,7 @@ function clearSync(platform, handle, all) {
     dbm.db.prepare('DELETE FROM submissions').run();
     dbm.db.prepare('DELETE FROM rating_history').run();
     dbm.db.prepare('DELETE FROM sync_state').run();
-    dbm.db.prepare('DELETE FROM solved_marks WHERE platform IN (?, ?, ?, ?)').run('codeforces', 'atcoder', 'luogu', 'leetcode');
+    dbm.db.prepare("DELETE FROM solved_marks WHERE platform IN ('codeforces','atcoder','luogu','leetcode','hdu','poj','vjudge','nowcoder','qoj')").run();
     return { cleared: 'all' };
   }
   dbm.db.prepare('DELETE FROM submissions WHERE platform = ?').run(platform);
@@ -282,7 +291,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === '/api/settings' && req.method === 'GET') {
-      const platforms = { codeforces: [], atcoder: [], luogu: [], leetcode: [] };
+      const platforms = { codeforces: [], atcoder: [], luogu: [], leetcode: [], hdu: [], poj: [], vjudge: [], nowcoder: [], qoj: [] };
       for (const u2 of dbm.listUsers()) platforms[u2.platform]?.push({ handle: u2.handle, label: u2.label });
       return json(res, {
         platforms,
@@ -322,6 +331,16 @@ const server = http.createServer(async (req, res) => {
           if (uc) dbm.removeUser('leetcode', uc.handle);
         }
       }
+      const simpleFields = { hdu_handle: 'hdu', poj_handle: 'poj', vj_handle: 'vjudge', nc_uid: 'nowcoder', qoj_handle: 'qoj' };
+      for (const [field, pf] of Object.entries(simpleFields)) {
+        if (b[field] !== undefined) {
+          if (b[field]) dbm.addUser(pf, String(b[field]).trim());
+          else {
+            const uc = dbm.listUsers().find((x) => x.platform === pf);
+            if (uc) dbm.removeUser(pf, uc.handle);
+          }
+        }
+      }
       if (b.luogu_cookie !== undefined) dbm.setSetting('luogu_cookie', String(b.luogu_cookie || ''));
       if (b.plan_target != null) dbm.setSetting('plan_target', +b.plan_target);
       if (b.plan_weekly != null) dbm.setSetting('plan_weekly', +b.plan_weekly);
@@ -335,7 +354,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       const platform = b.platform, handle = b.handle;
       if (!platform || !handle) return fail(res, '缺少 platform 或 handle', 400);
-      if (!['codeforces', 'atcoder', 'luogu', 'leetcode'].includes(platform)) return fail(res, '未知平台: ' + platform, 400);
+      if (!['codeforces', 'atcoder', 'luogu', 'leetcode', 'hdu', 'poj', 'vjudge', 'nowcoder', 'qoj'].includes(platform)) return fail(res, '未知平台: ' + platform, 400);
       const r = launchTask('sync', async () => {
         await syncPlatform(platform, handle, b.mode || 'latest');
       });
