@@ -18,44 +18,85 @@ const contests = require('./lib/contests');
 const icpc = require('./lib/icpc');
 const model = require('./lib/model');
 
-const PORT = parseInt(process.env.PORT, 10) || 5173;
+// ---------- 进程级兜底：单个错误不拖垮整个服务 ----------
+// Node 22 默认把未处理的 promise rejection 当作致命错误；本地单用户工具的正确取舍是
+// 记录日志并继续服务，而不是让整个进程退出（否则一次漏网错误 = 网站“打不开”）。
+process.on('uncaughtException', (e) => {
+  console.error('[xcpc-trainer] uncaughtException（已兜底，服务继续运行）:', e && e.stack || e);
+});
+process.on('unhandledRejection', (e) => {
+  console.error('[xcpc-trainer] unhandledRejection（已兜底，服务继续运行）:', e && e.stack || e);
+});
+
+// PORT=0 表示随机空闲端口（桌面版使用）；未设置时默认 5173
+const PORT = process.env.PORT !== undefined ? parseInt(process.env.PORT, 10) : 5173;
 const PUBLIC = path.join(__dirname, 'public');
 const USER = 'default';
+const START_TS = Date.now();
 
-// 首次启动：seed ICPC 目录
-icpc.seedCatalog();
+// 首次启动：seed ICPC 目录（失败不阻塞启动，后续接口会自行降级）
+try { icpc.seedCatalog(); } catch (e) { console.error('[xcpc-trainer] ICPC 目录初始化失败（可忽略）:', e.message); }
+// 启动后收缩一次 WAL（上次异常退出可能遗留大 WAL）
+dbm.checkpoint();
 
 // ---------- 工具 ----------
 function json(res, data, code = 200) {
-  const body = JSON.stringify(data);
+  let body;
+  try { body = JSON.stringify(data); } catch (e) { body = JSON.stringify({ error: '序列化失败: ' + e.message }); code = 500; }
   res.writeHead(code, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
   res.end(body);
 }
 function fail(res, message, code = 400) {
   json(res, { error: String(message) }, code);
 }
-async function readBody(req) {
+async function readBody(req, maxBytes = 1024 * 1024) {
   const chunks = [];
-  for await (const c of req) chunks.push(c);
+  let total = 0, over = false;
+  // 先全部读完（最多 8MB 防无限流），超限时丢弃内容但正常返回 413，而不是掐断连接
+  for await (const c of req) {
+    total += c.length;
+    if (total > maxBytes) {
+      over = true;
+      if (total > 8 * 1024 * 1024) break;   // 极端情况停止读取
+      continue;
+    }
+    chunks.push(c);
+  }
+  if (over) throw new BodyTooLargeError(`请求体超过 ${maxBytes} 字节上限`);
   const text = Buffer.concat(chunks).toString('utf8');
   if (!text) return {};
   try { return JSON.parse(text); } catch { return {}; }
 }
+class BodyTooLargeError extends Error {}
 
-// ---------- 后台任务执行器 ----------
+// ---------- 后台任务执行器（带超时与失败详情） ----------
 const running = new Map();
-function launchTask(key, fn) {
+const taskErrors = new Map();   // key -> 最近一次失败信息（供状态接口展示）
+const DEFAULT_TASK_TIMEOUT = 10 * 60 * 1000;   // 同步/导入类任务最长 10 分钟
+
+function launchTask(key, fn, { timeoutMs = DEFAULT_TASK_TIMEOUT } = {}) {
   if (running.has(key)) return { started: false, reason: '已有同名任务在运行' };
-  const task = fn().then(
-    () => ({ ok: true }),
-    (e) => ({ ok: false, error: e.message })
+  let timer = null;
+  const timed = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`任务超时（${Math.round(timeoutMs / 1000)}s），已中止`)), timeoutMs);
+    if (timer.unref) timer.unref();
+  });
+  const task = Promise.race([fn(), timed]).then(
+    (v) => ({ ok: true, ...(v && typeof v === 'object' ? v : {}) }),
+    (e) => {
+      taskErrors.set(key, { at: Math.floor(Date.now() / 1000), error: e.message });
+      return { ok: false, error: e.message };
+    }
   );
   running.set(key, task);
-  task.finally(() => running.delete(key));
+  task.finally(() => { clearTimeout(timer); running.delete(key); });
   return { started: true };
 }
 function taskState(key) {
   return running.has(key) ? 'running' : 'idle';
+}
+function taskErrorsSummary() {
+  return Object.fromEntries([...taskErrors].map(([k, v]) => [k, v]));
 }
 
 // ---------- 同步 ----------
@@ -95,6 +136,7 @@ async function syncPlatform(platform, handle, mode) {
       dbm.setSyncState(platform, handle, {
         last_sync: Math.floor(Date.now() / 1000), status: 'ok', error: '',
       });
+      dbm.checkpoint();
       return { passed: r.passed };
     }
     throw new Error('未知平台');
@@ -104,6 +146,9 @@ async function syncPlatform(platform, handle, mode) {
       last_sync: dbm.getSyncState(platform, handle).last_sync,
     });
     throw e;
+  } finally {
+    // 同步结束收缩 WAL，避免大写入后 wal 文件无限增长
+    dbm.checkpoint();
   }
 }
 
@@ -121,7 +166,7 @@ function clearSync(platform, handle, all) {
   return { cleared: platform };
 }
 
-// ---------- 训练模型（后台） ----------
+// ---------- 训练模型（后台，子进程带超时） ----------
 async function runModelTraining(contests) {
   const { spawn } = require('child_process');
   return new Promise((resolve, reject) => {
@@ -129,9 +174,19 @@ async function runModelTraining(contests) {
       ['--disable-warning=ExperimentalWarning', '--experimental-sqlite', path.join(__dirname, 'scripts', 'train-model.js'), '--contests', String(contests)],
       { cwd: __dirname, stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
+    let done = false;
+    const killTimer = setTimeout(() => {
+      if (!done) { done = true; try { child.kill('SIGKILL'); } catch {} reject(new Error('模型训练超时（20 分钟），已中止')); }
+    }, 20 * 60 * 1000);
+    if (killTimer.unref) killTimer.unref();
     child.stdout.on('data', (d) => (out += d));
     child.stderr.on('data', (d) => (out += d));
-    child.on('exit', (code) => (code === 0 ? resolve(out) : reject(new Error(out.slice(-1000)))));
+    child.on('exit', (code) => {
+      if (done) return;
+      done = true; clearTimeout(killTimer);
+      (code === 0 ? resolve(out) : reject(new Error(out.slice(-1000))));
+    });
+    child.on('error', (e) => { if (done) return; done = true; clearTimeout(killTimer); reject(e); });
   });
 }
 
@@ -201,9 +256,21 @@ const server = http.createServer(async (req, res) => {
       return serveFile(res, path.join(PUBLIC, path.basename(p)), 'text/html; charset=utf-8');
     }
     if (req.method === 'GET' && (p === '/' || p === '')) return serveFile(res, path.join(PUBLIC, 'index.html'), 'text/html; charset=utf-8');
+    // favicon：无图标时返回 204，避免浏览器自动请求产生 404 噪音
+    if (req.method === 'GET' && p === '/favicon.ico') {
+      res.writeHead(204, { 'cache-control': 'public, max-age=86400' });
+      res.end();
+      return;
+    }
 
     // ---- API ----
-    if (p === '/api/health' && req.method === 'GET') return json(res, { ok: true, app: 'xcpc-trainer', version: '0.1.0', dataDir: dbm.DATA_DIR });
+    if (p === '/api/health' && req.method === 'GET') {
+      return json(res, {
+        ok: true, app: 'xcpc-trainer', version: '0.1.0',
+        dataDir: dbm.DATA_DIR, uptime: Math.floor((Date.now() - START_TS) / 1000),
+        rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
+      });
+    }
 
     if (p === '/api/settings' && req.method === 'GET') {
       const platforms = { codeforces: [], atcoder: [], luogu: [] };
@@ -251,16 +318,20 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/sync' && req.method === 'POST') {
       const b = await readBody(req);
       const platform = b.platform, handle = b.handle;
+      if (!platform || !handle) return fail(res, '缺少 platform 或 handle', 400);
+      if (!['codeforces', 'atcoder', 'luogu'].includes(platform)) return fail(res, '未知平台: ' + platform, 400);
       const r = launchTask('sync', async () => {
         await syncPlatform(platform, handle, b.mode || 'latest');
       });
       return json(res, r);
     }
     if (p === '/api/sync/status' && req.method === 'GET') {
-      return json(res, { running: taskState('sync') === 'running', states: stats.syncStatusSummary(), tasks: Object.fromEntries([...running.keys()].map((k) => [k, true])) });
+      return json(res, { running: taskState('sync') === 'running', states: stats.syncStatusSummary(), tasks: Object.fromEntries([...running.keys()].map((k) => [k, true])), errors: taskErrorsSummary() });
     }
     if (p === '/api/sync/clear' && req.method === 'POST') {
       const b = await readBody(req);
+      if (running.has('sync')) return fail(res, '同步正在进行中，请等它结束后再清空', 409);
+      if (running.has('luogu-import-' + (b.tier ?? ''))) return fail(res, '题库导入正在进行中，请稍后', 409);
       return json(res, clearSync(b.platform, b.handle, b.all));
     }
 
@@ -483,22 +554,45 @@ const server = http.createServer(async (req, res) => {
 
     return fail(res, `未知接口: ${p}`, 404);
   } catch (e) {
+    if (e instanceof BodyTooLargeError) return fail(res, e.message, 413);
     console.error(`[API ${req.method} ${p}]`, e && e.stack || e);
     fail(res, e.message, 500);
   }
 });
 
 function serveFile(res, file, type) {
-  if (!fs.existsSync(file)) {
+  let st;
+  try {
+    st = fs.statSync(file);
+  } catch {
     res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
     res.end('404 Not Found');
     return;
   }
-  res.writeHead(200, { 'content-type': type });
-  fs.createReadStream(file).pipe(res);
+  res.writeHead(200, {
+    'content-type': type,
+    'content-length': st.size,
+    'cache-control': type.includes('text/html') ? 'no-cache' : 'public, max-age=300',
+  });
+  const stream = fs.createReadStream(file);
+  // 读取中途出错（文件被删/被锁）时兜底返回，而不是让 stream error 事件未处理导致进程崩溃
+  stream.on('error', () => {
+    try { res.destroy(); } catch { /* 连接可能已关闭 */ }
+  });
+  stream.pipe(res);
 }
 
+server.on('error', (e) => {
+  console.error('[xcpc-trainer] 服务启动失败:', e.message);
+  process.exit(1);
+});
 server.listen(PORT, () => {
-  console.log(`XCPC 训练台已启动： http://127.0.0.1:${PORT}`);
+  const actual = server.address().port;
+  if (PORT === 0) {
+    // 桌面版通过子进程拉起：输出一行 XC_PORT=<port> 供主进程解析
+    console.log(`XC_PORT=${actual}`);
+  } else {
+    console.log(`XCPC 训练台已启动： http://127.0.0.1:${actual}`);
+  }
   console.log(`数据目录： ${dbm.DATA_DIR}（复制 data/xcpc.db 即可备份）`);
 });

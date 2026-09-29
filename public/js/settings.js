@@ -93,7 +93,8 @@ async function loadSync() {
 async function pollUntilIdle() {
   for (let i = 0; i < 60; i++) {
     await new Promise((r) => setTimeout(r, 2500));
-    const st = await api('/sync/status');
+    const st = await api('/sync/status', { silent: true }).catch(() => null);
+    if (!st) continue;
     if (!st.running) { loadSync(); flash('同步完成'); return; }
   }
   loadSync();
@@ -123,7 +124,8 @@ async function loadTiers() {
       const key = 'luogu-import-' + tier;
       for (let i = 0; i < 90; i++) {
         await new Promise((r2) => setTimeout(r2, 2000));
-        const st = await api('/sync/status');
+        const st = await api('/sync/status', { silent: true }).catch(() => null);
+        if (!st) continue;
         if (!st.tasks || !st.tasks[key]) {
           $('luoguStatus').textContent = '抓取完成';
           loadTiers();
@@ -179,8 +181,7 @@ async function initTrain() {
 async function init2() {
   $('btnTrain').addEventListener('click', initTrain);
   // 数据目录
-  const r = await fetch('/api/health');
-  const h = await r.json();
+  const h = await api('/health', { silent: true }).catch(() => ({}));
   const el = document.getElementById('dataDir');
   if (el) el.textContent = h.dataDir || '';
 }

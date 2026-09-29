@@ -1,17 +1,40 @@
 'use strict';
 /* common.js — 公共工具：API 封装、主题、导航、格式化 */
 
+/** 统一 API 封装：带超时与错误提示。超时默认 20s（长轮询可传 opts.timeout 覆盖）。 */
 async function api(path, opts = {}) {
-  const res = await fetch('/api' + path, {
-    headers: { 'content-type': 'application/json' },
-    ...opts,
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
-  if (opts.blob) return res.blob();
-  const j = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(j.error || ('请求失败 HTTP ' + res.status));
-  return j;
+  const timeout = opts.timeout || 20000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch('/api' + path, {
+      headers: { 'content-type': 'application/json' },
+      signal: controller.signal,
+      ...opts,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.error || ('请求失败 HTTP ' + res.status));
+    }
+    if (opts.blob) return res.blob();
+    return await res.json();
+  } catch (e) {
+    const msg = e.name === 'AbortError' ? '请求超时，请稍后重试' : (e.message || '网络错误');
+    if (opts.silent !== true) flash(msg, 'err');
+    throw new Error(msg);
+  } finally {
+    clearTimeout(timer);
+  }
 }
+
+// 全局兜底：页面脚本任何未捕获错误都给出可见提示，而不是白屏
+window.addEventListener('error', (e) => {
+  if (e && e.message) flash('页面异常: ' + e.message, 'err');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  if (e && e.reason && e.reason.message) flash('请求失败: ' + e.reason.message, 'err');
+});
 
 const PLATFORM = {
   codeforces: { name: 'Codeforces', short: 'CF', color: '#4f9cf9' },
@@ -43,13 +66,18 @@ function ratingLabel(platform, rating) {
   return rating;
 }
 
-/** 应用主题 */
+/** 应用主题（失败时回退暗色，不阻塞页面加载） */
 async function applyTheme() {
-  const s = await api('/settings');
-  document.documentElement.setAttribute('data-theme', s.theme || 'dark');
-  const sel = document.getElementById('themeSel');
-  if (sel) sel.value = s.theme || 'dark';
-  return s;
+  try {
+    const s = await api('/settings', { silent: true });
+    document.documentElement.setAttribute('data-theme', s.theme || 'dark');
+    const sel = document.getElementById('themeSel');
+    if (sel) sel.value = s.theme || 'dark';
+    return s;
+  } catch {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    return null;
+  }
 }
 
 /** 渲染顶栏导航 */

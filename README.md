@@ -14,7 +14,34 @@
 
 环境要求：**Windows / macOS / Linux**，安装 **Node.js 22.5 或更高**（[https://nodejs.org/](https://nodejs.org/) ，本程序使用 Node 内置的 SQLite，无需 `npm install`）。
 
-### 方式一：命令行启动
+### 方式一：桌面版（推荐）
+
+Windows 安装程序：`dist/XCPC-Trainer-Setup-0.1.0.exe`，双击安装后从开始菜单或桌面快捷方式打开——独立窗口程序，不需要终端，也不需要浏览器。
+
+桌面版用 Electron 封装：启动时在随机空闲端口拉起内置 HTTP 服务，再用原生窗口打开，与网页版共用同一套后端与界面代码。**桌面版数据保存在 `%APPDATA%\xcpc-trainer\data`**（卸载重装不丢；网页版数据在项目 `data/` 目录，两者独立）。
+
+自己打包桌面版：
+
+```bash
+npm install                     # 首次打包才需要，会下载 Electron（约 200MB）
+npm run desktop                 # 开发模式直接运行桌面窗口
+npm run build                   # 生成 Windows 安装程序，产物在 dist/
+```
+
+如果下载 Electron 卡住（国内网络常见），先设置镜像：
+
+```powershell
+$env:ELECTRON_MIRROR='https://npmmirror.com/mirrors/electron/'
+$env:ELECTRON_BUILDER_BINARIES_MIRROR='https://npmmirror.com/mirrors/electron-builder-binaries/'
+```
+
+验证桌面版是否正常：
+
+```bash
+npm run desktop-smoke           # 隐藏窗口启动，检查页面渲染与 JS 报错后退出
+```
+
+### 方式二：命令行启动
 
 
 
@@ -195,6 +222,10 @@ scripts/train-model.js    采集比赛数据训练推题模型
 
 scripts/smoke.mjs         端到端冒烟测试
 
+scripts/desktop-smoke.mjs 桌面版冒烟测试（隐藏窗口渲染检查）
+
+electron/main.js          Electron 桌面版主进程（随机端口拉起内置服务 + 原生窗口）
+
 public/                   六个页面（总览 / 训练计划 / 题库 / 比赛与虚拟赛 / ICPC追踪 / 设置）
 
 data/xcpc.db              你的所有数据（复制即备份，删除可重建）
@@ -206,7 +237,7 @@ data/xcpc.db              你的所有数据（复制即备份，删除可重建
 
 
 
-* 数据目录：`<项目根目录>/data`，主文件为 `data/xcpc.db`。
+* 数据目录：网页版为 `<项目根目录>/data`，主文件为 `data/xcpc.db`；桌面版为 `%APPDATA%\xcpc-trainer\data`。
 
 * **备份 / 迁移**：先退出程序，再复制整个 `data` 目录即可。程序重启会自动兼容旧库结构。
 

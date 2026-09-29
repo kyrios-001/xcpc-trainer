@@ -36,7 +36,17 @@ async function init() {
 }
 
 async function loadAll() {
-  await Promise.all([loadStats(), loadActivity(), loadRating(), loadDifficulty(), loadRecent(), loadSources()]);
+  // 各模块独立加载：单个模块失败不影响其他模块渲染（避免一处报错整页白屏）
+  const modules = [
+    ['统计', loadStats], ['活动砖', loadActivity], ['Rating 曲线', loadRating],
+    ['难度足迹', loadDifficulty], ['近期 AC', loadRecent], ['数据源状态', loadSources],
+  ];
+  const results = await Promise.allSettled(modules.map(([, fn]) => fn()));
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].status === 'rejected') {
+      console.error(`模块 ${modules[i][0]} 加载失败:`, results[i].reason);
+    }
+  }
 }
 
 // ---------- 生涯统计 ----------
@@ -241,7 +251,7 @@ async function loadSources() {
 
 async function pollStatus() {
   setInterval(async () => {
-    const st = await api('/sync/status').catch(() => null);
+    const st = await api('/sync/status', { silent: true }).catch(() => null);
     if (st && st.running) loadSources();
   }, 3000);
 }

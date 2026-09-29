@@ -237,7 +237,7 @@ async function loadHistory() {
 // ---------- 轮询刷新赛内状态 ----------
 async function pollActive() {
   if (!activeSession || activeSession.status === 'finished') return;
-  const s = await api(`/virtual?session=${activeSession.id}`).catch(() => null);
+  const s = await api(`/virtual?session=${activeSession.id}`, { silent: true }).catch(() => null);
   if (s) {
     const prevStatus = activeSession.status;
     activeSession = s;

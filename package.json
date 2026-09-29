@@ -4,13 +4,54 @@
   "private": true,
   "description": "XCPC 训练辅助软件：多平台训练数据面板 + 分阶段训练计划 + 虚拟参赛与复盘 + ICPC/CCPC 补题追踪",
   "type": "commonjs",
+  "main": "electron/main.js",
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning --experimental-sqlite server.js",
     "sync": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/sync-problems.js",
     "train": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/train-model.js",
-    "smoke": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/smoke.mjs"
+    "smoke": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/smoke.mjs",
+    "desktop": "electron .",
+    "desktop-smoke": "electron scripts/desktop-smoke.mjs",
+    "build": "electron-builder --win"
   },
   "engines": {
     "node": ">=22.5.0"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.xcpc.trainer",
+    "productName": "XCPC-Trainer",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "server.js",
+      "lib/**",
+      "public/**",
+      "scripts/**",
+      "electron/**",
+      "package.json",
+      "README.md"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "XCPC 训练台",
+      "artifactName": "XCPC-Trainer-Setup-${version}.${ext}"
+    }
   }
 }
