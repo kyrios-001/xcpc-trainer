@@ -50,9 +50,9 @@
           <summary style="cursor:pointer">如何获取洛谷 Cookie（Chrome / Edge）</summary>
           <ol style="margin:6px 0 0 0;padding-left:20px;line-height:1.8">
             <li>浏览器打开 <a href="https://www.luogu.com.cn/" target="_blank">luogu.com.cn</a> 并登录账号；</li>
-            <li>按 <b>F12</b> 打开开发者工具，切到 <b>Application / 应用</b> 标签页；</li>
-            <li>左侧 <b>Cookies</b> → <b>https://www.luogu.com.cn</b>；</li>
-            <li>复制页面上任意一条 Cookie 的完整值（如 <code>_uid=123456; ...</code> 整段粘贴到上方输入框）即可。</li>
+            <li>按 <b>F12</b> → 切到 <b>Network / 网络</b> 标签 → 刷新页面（F5）；</li>
+            <li>点列表里任意一条请求 → 右侧 <b>Headers / 标头</b> → 找 <b>Request Headers / 请求标头</b> 里的 <code>Cookie:</code> 那一行；</li>
+            <li>复制 <code>Cookie:</code> 冒号后面的<b>整段</b>（形如 <code>__client_id=...; _uid=...; C3VK=...</code>），粘贴到上方输入框。只复制一条 Cookie 不够，必须整段。</li>
           </ol>
         </details>
       </div>
