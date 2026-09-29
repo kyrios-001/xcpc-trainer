@@ -113,7 +113,7 @@ async function loadSync() {
   box.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
     const [pf, handle] = b.dataset.del.split(':');
     if (!confirm(`删除账号 ${PLATFORM[pf]?.name} / ${handle}？\n这会同时删除它的所有同步数据（提交记录、Rating、做题标记），不可恢复。`)) return;
-    await api('/api/user', { method: 'DELETE', body: { platform: pf, handle } });
+    await api('/user', { method: 'DELETE', body: { platform: pf, handle } });
     flash('账号已删除');
     loadSync();
   }));
