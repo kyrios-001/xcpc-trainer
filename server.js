@@ -13,6 +13,7 @@ const stats = require('./lib/stats');
 const cf = require('./lib/cf');
 const ac = require('./lib/ac');
 const luogu = require('./lib/luogu');
+const leetcode = require('./lib/leetcode');
 const plan = require('./lib/plan');
 const contests = require('./lib/contests');
 const icpc = require('./lib/icpc');
@@ -139,6 +140,14 @@ async function syncPlatform(platform, handle, mode) {
       dbm.checkpoint();
       return { passed: r.passed };
     }
+    if (platform === 'leetcode') {
+      const r = await leetcode.syncUser(handle);
+      dbm.setSyncState(platform, handle, {
+        cursor: '', last_sync: Math.floor(Date.now() / 1000), status: 'ok', error: '',
+      });
+      dbm.checkpoint();
+      return { solved: r.solved, ranking: r.ranking };
+    }
     throw new Error('未知平台');
   } catch (e) {
     dbm.setSyncState(platform, handle, {
@@ -157,7 +166,7 @@ function clearSync(platform, handle, all) {
     dbm.db.prepare('DELETE FROM submissions').run();
     dbm.db.prepare('DELETE FROM rating_history').run();
     dbm.db.prepare('DELETE FROM sync_state').run();
-    dbm.db.prepare('DELETE FROM solved_marks WHERE platform IN (?, ?, ?)').run('codeforces', 'atcoder', 'luogu');
+    dbm.db.prepare('DELETE FROM solved_marks WHERE platform IN (?, ?, ?, ?)').run('codeforces', 'atcoder', 'luogu', 'leetcode');
     return { cleared: 'all' };
   }
   dbm.db.prepare('DELETE FROM submissions WHERE platform = ?').run(platform);
@@ -273,7 +282,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === '/api/settings' && req.method === 'GET') {
-      const platforms = { codeforces: [], atcoder: [], luogu: [] };
+      const platforms = { codeforces: [], atcoder: [], luogu: [], leetcode: [] };
       for (const u2 of dbm.listUsers()) platforms[u2.platform]?.push({ handle: u2.handle, label: u2.label });
       return json(res, {
         platforms,
@@ -306,6 +315,13 @@ const server = http.createServer(async (req, res) => {
         if (b.lg_uid) dbm.addUser('luogu', String(b.lg_uid).trim());
         else dbm.removeUser('luogu', (dbm.listUsers().find((x) => x.platform === 'luogu') || {}).handle || '');
       }
+      if (b.lc_handle !== undefined) {
+        if (b.lc_handle) dbm.addUser('leetcode', String(b.lc_handle).trim());
+        else {
+          const uc = dbm.listUsers().find((x) => x.platform === 'leetcode');
+          if (uc) dbm.removeUser('leetcode', uc.handle);
+        }
+      }
       if (b.luogu_cookie !== undefined) dbm.setSetting('luogu_cookie', String(b.luogu_cookie || ''));
       if (b.plan_target != null) dbm.setSetting('plan_target', +b.plan_target);
       if (b.plan_weekly != null) dbm.setSetting('plan_weekly', +b.plan_weekly);
@@ -319,7 +335,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       const platform = b.platform, handle = b.handle;
       if (!platform || !handle) return fail(res, '缺少 platform 或 handle', 400);
-      if (!['codeforces', 'atcoder', 'luogu'].includes(platform)) return fail(res, '未知平台: ' + platform, 400);
+      if (!['codeforces', 'atcoder', 'luogu', 'leetcode'].includes(platform)) return fail(res, '未知平台: ' + platform, 400);
       const r = launchTask('sync', async () => {
         await syncPlatform(platform, handle, b.mode || 'latest');
       });
@@ -333,6 +349,17 @@ const server = http.createServer(async (req, res) => {
       if (running.has('sync')) return fail(res, '同步正在进行中，请等它结束后再清空', 409);
       if (running.has('luogu-import-' + (b.tier ?? ''))) return fail(res, '题库导入正在进行中，请稍后', 409);
       return json(res, clearSync(b.platform, b.handle, b.all));
+    }
+    if (p === '/api/user' && req.method === 'DELETE') {
+      const b = await readBody(req);
+      if (!b.platform || !b.handle) return fail(res, '缺少 platform 或 handle', 400);
+      dbm.removeUser(b.platform, b.handle);
+      dbm.db.prepare('DELETE FROM submissions WHERE platform=? AND user=?').run(b.platform, b.handle);
+      dbm.db.prepare('DELETE FROM rating_history WHERE platform=? AND user=?').run(b.platform, b.handle);
+      dbm.db.prepare('DELETE FROM solved_marks WHERE platform=? AND user=?').run(b.platform, b.handle);
+      dbm.db.prepare('DELETE FROM sync_state WHERE platform=? AND user=?').run(b.platform, b.handle);
+      dbm.checkpoint();
+      return json(res, { deleted: b.handle });
     }
 
     if (p === '/api/stats' && req.method === 'GET') {

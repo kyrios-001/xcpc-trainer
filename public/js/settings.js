@@ -16,6 +16,8 @@ async function init() {
   $('acHandle').value = (s.platforms.atcoder[0] || {}).handle || '';
   $('lgUid').value = (s.platforms.luogu[0] || {}).handle || '';
   if (s.luogu_cookie_set) $('lgCookie').value = '（已保存）';
+  const lcUser = s.platforms.leetcode && s.platforms.leetcode[0];
+  if (lcUser) $('lcHandle').value = lcUser.handle;
 
   $('btnSaveCf').addEventListener('click', async () => {
     await api('/settings', { method: 'POST', body: { cf_handle: $('cfHandle').value.trim() } });
@@ -35,6 +37,12 @@ async function init() {
     await api('/settings', { method: 'POST', body: { luogu_cookie: v } });
     $('lgCookie').value = '（已保存）';
     flash('Cookie 已保存（仅存本地）');
+  });
+  $('btnSaveLc').addEventListener('click', async () => {
+    const v = $('lcHandle').value.trim();
+    await api('/settings', { method: 'POST', body: { lc_handle: v } });
+    flash(v ? 'LeetCode 账号已保存' : 'LeetCode 账号已删除');
+    await loadSync();
   });
 
   $('btnClearAll').addEventListener('click', async () => {
@@ -70,6 +78,7 @@ async function loadSync() {
         <button class="btn sm" data-sync="${pf}:${u.handle}:latest">同步最新</button>
         <button class="btn sm" data-sync="${pf}:${u.handle}:full">重新同步全部</button>
         <button class="btn sm danger" data-clear="${pf}:${u.handle}">清空单站</button>
+        <button class="btn sm danger" data-del="${pf}:${u.handle}" title="删除此账号及其所有同步数据">删除账号</button>
       </div>
     </div>`).join('');
   box.querySelectorAll('[data-sync]').forEach((b) => b.addEventListener('click', async () => {
@@ -86,6 +95,13 @@ async function loadSync() {
     if (!confirm(`清空 ${PLATFORM[pf]?.name}（${handle}）的同步数据？账号设置保留。`)) return;
     await api('/sync/clear', { method: 'POST', body: { platform: pf } });
     flash('已清空该站数据');
+    loadSync();
+  }));
+  box.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
+    const [pf, handle] = b.dataset.del.split(':');
+    if (!confirm(`删除账号 ${PLATFORM[pf]?.name} / ${handle}？\n这会同时删除它的所有同步数据（提交记录、Rating、做题标记），不可恢复。`)) return;
+    await api('/api/user', { method: 'DELETE', body: { platform: pf, handle } });
+    flash('账号已删除');
     loadSync();
   }));
 }

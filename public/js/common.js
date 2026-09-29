@@ -40,6 +40,7 @@ const PLATFORM = {
   codeforces: { name: 'Codeforces', short: 'CF', color: '#4f9cf9' },
   atcoder: { name: 'AtCoder', short: 'AC', color: '#d29922' },
   luogu: { name: '洛谷', short: '洛谷', color: '#3fb950' },
+  leetcode: { name: 'LeetCode', short: 'LC', color: '#ffa116' },
 };
 
 function esc(s) {
