@@ -59,10 +59,15 @@ function fmtDur(sec) {
   return h > 0 ? `${h}h${String(m).padStart(2, '0')}m` : `${m}m${String(s).padStart(2, '0')}s`;
 }
 
+// 洛谷题统一按官方档位折算为练习分入库；展示时同时给出档位名与折算分
+const LUOGU_TIER_LABEL = [[1000, '入门'], [1300, '普及−'], [1450, '普及'], [1700, '普及+/提高'], [1950, '提高'], [2200, '提高+/省选−'], [2550, '省选/NOI−']];
 function ratingLabel(platform, rating) {
   if (rating == null) return '未评级';
   if (platform === 'atcoder') return `AC ${rating}`;
-  if (platform === 'luogu') return rating;   // 已折算练习分
+  if (platform === 'luogu') {
+    const t = LUOGU_TIER_LABEL.find((x) => x[0] === rating);
+    return t ? `${t[1]}·${rating}` : `洛谷 ${rating}`;
+  }
   return rating;
 }
 

@@ -46,6 +46,15 @@
           <button class="btn sm" id="btnSaveCookie">保存 Cookie</button>
           <span class="muted small">Cookie 只保存在本地数据库，不外传。</span>
         </div>
+        <details class="mt small muted" style="border:1px solid var(--border);border-radius:6px;padding:6px 10px">
+          <summary style="cursor:pointer">如何获取洛谷 Cookie（Chrome / Edge）</summary>
+          <ol style="margin:6px 0 0 0;padding-left:20px;line-height:1.8">
+            <li>浏览器打开 <a href="https://www.luogu.com.cn/" target="_blank">luogu.com.cn</a> 并登录账号；</li>
+            <li>按 <b>F12</b> 打开开发者工具，切到 <b>Application / 应用</b> 标签页；</li>
+            <li>左侧 <b>Cookies</b> → <b>https://www.luogu.com.cn</b>；</li>
+            <li>复制页面上任意一条 Cookie 的完整值（如 <code>_uid=123456; ...</code> 整段粘贴到上方输入框）即可。</li>
+          </ol>
+        </details>
       </div>
     </div>
   </div>
@@ -60,7 +69,7 @@
 
   <div class="card">
     <h2>洛谷题库导入</h2>
-    <div class="muted small mb">按难度档等距抽页抓取（每档 8 页 ≈ 400 题），单线程 1.2 秒一个请求。入库按难度档增量替换，抓新档不会清掉旧档。</div>
+    <div class="muted small mb">按洛谷官方难度档抓取（与题目列表页筛选一致：入门 / 普及− / 普及 / 普及+/提高 / 提高 / 提高+/省选− / 省选/NOI−）。每档等距抽 8 页，单线程 1.2 秒一个请求；入库按难度档增量替换，抓新档不会清掉旧档。题目难度统一折算为练习分（悬停可看真实档位），用于与 CF / AtCoder 题统一排计划。</div>
     <div id="luoguTiers"></div>
     <div class="small muted mt" id="luoguStatus"></div>
   </div>

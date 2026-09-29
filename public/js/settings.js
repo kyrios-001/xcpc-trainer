@@ -105,13 +105,14 @@ async function loadTiers() {
   const tiers = await api('/luogu/tiers');
   const counts = (await api('/settings')).luogu_tier_counts;
   const box = $('luoguTiers');
-  box.innerHTML = tiers.map((t) => {
+  box.innerHTML = tiers.filter((t) => t.low != null).map((t) => {
     const n = counts[t.key] || 0;
     return `<div class="row" style="border-bottom:1px solid var(--border);padding:6px 0">
-      <span style="width:150px">${t.name}（${t.low}~${t.high}）</span>
+      <span style="width:170px" title="洛谷官方档位：${t.name}">${t.name}</span>
+      <span class="small muted" style="width:130px" title="折算为 CF 练习分区间，便于与 CF/AtCoder 题统一排计划">折算 ${t.low}~${t.high}</span>
       <span class="small muted" style="width:90px">已入库 ${n} 题</span>
-      <button class="btn sm" data-tier="${t.key}" ${t.key === 0 ? 'disabled title="入门档对训练没意义，不抓"' : ''}>抓取题库</button>
-      <span class="small muted">${t.key === 0 ? '入门档默认不抓' : '约 8 页 / 1.2s 每请求'}</span>
+      <button class="btn sm" data-tier="${t.key}">抓取题库</button>
+      <span class="small muted">约 8 页 / 1.2s 每请求</span>
     </div>`;
   }).join('');
   box.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', async () => {
