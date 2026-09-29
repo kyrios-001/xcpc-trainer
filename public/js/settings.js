@@ -58,7 +58,7 @@ async function init() {
     await loadSync();
   }));
 
-  await Promise.all([loadSync(), loadTiers(), loadModel()]);
+  await Promise.all([loadSync(), loadTiers()]);
 }
 
 // ---------- 同步控制 ----------
@@ -156,44 +156,7 @@ async function loadTiers() {
   }));
 }
 
-// ---------- 模型 ----------
-async function loadModel() {
-  const m = await api('/model');
-  const box = $('modelBox');
-  if (!m) {
-    box.innerHTML = '<div class="muted small">尚未训练。训练后模型若通过检验（留出集 AUC ≥ 0.75 且优于基线）会自动用于选题，否则继续用内置规则。</div>';
-    return;
-  }
-  const trainedAt = m.trainedAt ? new Date(m.trainedAt).toLocaleString() : '-';
-  box.innerHTML = `<div class="row">
-    <span class="badge ${m.enabled ? 'ok' : ''}">${m.enabled ? '已启用' : '未启用'}</span>
-    <span class="small muted">样本 ${m.samples} · AUC ${m.auc ? m.auc.toFixed(3) : '-'}（基线 ${m.baseAuc ? m.baseAuc.toFixed(3) : '-'}）· LogLoss ${m.logloss ? m.logloss.toFixed(4) : '-'} · 训练于 ${esc(trainedAt)}</span>
-  </div>
-  ${m.note ? `<div class="small muted mt">说明：${esc(m.note)}</div>` : ''}`;
-}
-
-async function initTrain() {
-  const btn = $('btnTrain');
-  btn.disabled = true;
-  try {
-    const n = +$('trainContests').value || 60;
-    const r = await api('/model/train', { method: 'POST', body: { contests: n } });
-    if (!r.started) { flash(r.reason || '已有训练在运行', 'warn'); btn.disabled = false; return; }
-    flash('训练已启动，需要较长时间，请稍候...');
-    for (let i = 0; i < 240; i++) {
-      await new Promise((r2) => setTimeout(r2, 3000));
-      const s = await api('/settings');
-      if (!s.tasks || !s.tasks.train) { await loadModel(); flash('训练完成'); btn.disabled = false; return; }
-    }
-    btn.disabled = false;
-  } catch (e) {
-    flash('训练失败：' + e.message, 'err');
-    btn.disabled = false;
-  }
-}
-
 async function init2() {
-  $('btnTrain').addEventListener('click', initTrain);
   // 数据目录
   const h = await api('/health', { silent: true }).catch(() => ({}));
   const el = document.getElementById('dataDir');

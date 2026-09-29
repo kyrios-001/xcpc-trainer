@@ -1,94 +1,94 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XCPC 训练台 · 设置</title>
-<link rel="stylesheet" href="/css/style.css?v=2">
+<title>XCPC 璁粌鍙?路 璁剧疆</title>
+<link rel="stylesheet" href="/css/style.css?v=3">
 </head>
 <body>
 <div class="topbar">
-  <span class="brand">XCPC<b>训练台</b></span>
+  <span class="brand">XCPC<b>璁粌鍙?/b></span>
   <nav class="nav"></nav>
   <span class="spacer"></span>
   <select id="themeSel" style="width:96px">
-    <option value="dark">暗色</option><option value="light">亮色</option>
-    <option value="gray">灰色</option><option value="eye">护眼</option>
+    <option value="dark">鏆楄壊</option><option value="light">浜壊</option>
+    <option value="gray">鐏拌壊</option><option value="eye">鎶ょ溂</option>
   </select>
 </div>
 
 <div class="container">
   <div class="card">
-    <h2>账号与凭据</h2>
+    <h2>璐﹀彿涓庡嚟鎹?/h2>
     <div class="grid cols-2">
       <div class="field">
         <label>Codeforces Handle</label>
-        <div class="row"><input type="text" id="cfHandle" placeholder="如 tourist" style="flex:1">
-          <button class="btn primary sm" id="btnSaveCf">保存</button></div>
-        <div class="small muted mt">无需 Cookie，可获取逐题 AC、难度与 Rating。</div>
+        <div class="row"><input type="text" id="cfHandle" placeholder="濡?tourist" style="flex:1">
+          <button class="btn primary sm" id="btnSaveCf">淇濆瓨</button></div>
+        <div class="small muted mt">鏃犻渶 Cookie锛屽彲鑾峰彇閫愰 AC銆侀毦搴︿笌 Rating銆?/div>
       </div>
       <div class="field">
-        <label>AtCoder 用户名</label>
-        <div class="row"><input type="text" id="acHandle" placeholder="如 chokudai" style="flex:1">
-          <button class="btn primary sm" id="btnSaveAc">保存</button></div>
-        <div class="small muted mt">题目/难度来自 Kenkoooo 公开接口，无需登录。</div>
+        <label>AtCoder 鐢ㄦ埛鍚?/label>
+        <div class="row"><input type="text" id="acHandle" placeholder="濡?chokudai" style="flex:1">
+          <button class="btn primary sm" id="btnSaveAc">淇濆瓨</button></div>
+        <div class="small muted mt">棰樼洰/闅惧害鏉ヨ嚜 Kenkoooo 鍏紑鎺ュ彛锛屾棤闇€鐧诲綍銆?/div>
       </div>
       <div class="field">
-        <label>洛谷 UID（数字）</label>
-        <div class="row"><input type="text" id="lgUid" placeholder="如 123456" style="flex:1">
-          <button class="btn primary sm" id="btnSaveLg">保存</button></div>
-        <div class="small muted mt">做题记录需要登录 Cookie；无 Cookie 时只可导入题库。</div>
+        <label>娲涜胺 UID锛堟暟瀛楋級</label>
+        <div class="row"><input type="text" id="lgUid" placeholder="濡?123456" style="flex:1">
+          <button class="btn primary sm" id="btnSaveLg">淇濆瓨</button></div>
+        <div class="small muted mt">鍋氶璁板綍闇€瑕佺櫥褰?Cookie锛涙棤 Cookie 鏃跺彧鍙鍏ラ搴撱€?/div>
       </div>
       <div class="field">
-        <label>HDU 账号</label>
-        <div class="row"><input type="text" id="hduHandle" placeholder="如 tourist" style="flex:1">
-          <button class="btn primary sm" data-save="hdu:hduHandle">保存</button></div>
-        <div class="small muted mt">抓 AC 总数，无需登录。</div>
+        <label>HDU 璐﹀彿</label>
+        <div class="row"><input type="text" id="hduHandle" placeholder="濡?tourist" style="flex:1">
+          <button class="btn primary sm" data-save="hdu:hduHandle">淇濆瓨</button></div>
+        <div class="small muted mt">鎶?AC 鎬绘暟锛屾棤闇€鐧诲綍銆?/div>
       </div>
       <div class="field">
-        <label>POJ 账号</label>
-        <div class="row"><input type="text" id="pojHandle" placeholder="如 tourist" style="flex:1">
-          <button class="btn primary sm" data-save="poj:pojHandle">保存</button></div>
-        <div class="small muted mt">抓 AC 总数，无需登录。</div>
+        <label>POJ 璐﹀彿</label>
+        <div class="row"><input type="text" id="pojHandle" placeholder="濡?tourist" style="flex:1">
+          <button class="btn primary sm" data-save="poj:pojHandle">淇濆瓨</button></div>
+        <div class="small muted mt">鎶?AC 鎬绘暟锛屾棤闇€鐧诲綍銆?/div>
       </div>
       <div class="field">
-        <label>VJudge 账号</label>
-        <div class="row"><input type="text" id="vjHandle" placeholder="如 tourist" style="flex:1">
-          <button class="btn primary sm" data-save="vjudge:vjHandle">保存</button></div>
-        <div class="small muted mt">抓 AC 总数，无需登录。</div>
+        <label>VJudge 璐﹀彿</label>
+        <div class="row"><input type="text" id="vjHandle" placeholder="濡?tourist" style="flex:1">
+          <button class="btn primary sm" data-save="vjudge:vjHandle">淇濆瓨</button></div>
+        <div class="small muted mt">鎶?AC 鎬绘暟锛屾棤闇€鐧诲綍銆?/div>
       </div>
       <div class="field">
-        <label>牛客 UID（数字）</label>
-        <div class="row"><input type="text" id="ncUid" placeholder="个人主页 URL 里的数字" style="flex:1">
-          <button class="btn primary sm" data-save="nowcoder:ncUid">保存</button></div>
-        <div class="small muted mt">逐题数据需登录 Cookie，暂记录账号。</div>
+        <label>鐗涘 UID锛堟暟瀛楋級</label>
+        <div class="row"><input type="text" id="ncUid" placeholder="涓汉涓婚〉 URL 閲岀殑鏁板瓧" style="flex:1">
+          <button class="btn primary sm" data-save="nowcoder:ncUid">淇濆瓨</button></div>
+        <div class="small muted mt">閫愰鏁版嵁闇€鐧诲綍 Cookie锛屾殏璁板綍璐﹀彿銆?/div>
       </div>
       <div class="field">
-        <label>QOJ 用户名</label>
-        <div class="row"><input type="text" id="qojHandle" placeholder="qoj.ac 用户名" style="flex:1">
-          <button class="btn primary sm" data-save="qoj:qojHandle">保存</button></div>
-        <div class="small muted mt">ICPC/CCPC 补题，逐题需 UOJSESSID。</div>
+        <label>QOJ 鐢ㄦ埛鍚?/label>
+        <div class="row"><input type="text" id="qojHandle" placeholder="qoj.ac 鐢ㄦ埛鍚? style="flex:1">
+          <button class="btn primary sm" data-save="qoj:qojHandle">淇濆瓨</button></div>
+        <div class="small muted mt">ICPC/CCPC 琛ラ锛岄€愰闇€ UOJSESSID銆?/div>
       </div>
       <div class="field">
-        <label>LeetCode 用户名</label>
-        <div class="row"><input type="text" id="lcHandle" placeholder="国际站 /u/ 后的用户名，或 cn:用户名" style="flex:1">
-          <button class="btn primary sm" id="btnSaveLc">保存</button></div>
-        <div class="small muted mt">公开活动与题量，无需登录；国际站 Rating 可同步。</div>
+        <label>LeetCode 鐢ㄦ埛鍚?/label>
+        <div class="row"><input type="text" id="lcHandle" placeholder="鍥介檯绔?/u/ 鍚庣殑鐢ㄦ埛鍚嶏紝鎴?cn:鐢ㄦ埛鍚? style="flex:1">
+          <button class="btn primary sm" id="btnSaveLc">淇濆瓨</button></div>
+        <div class="small muted mt">鍏紑娲诲姩涓庨閲忥紝鏃犻渶鐧诲綍锛涘浗闄呯珯 Rating 鍙悓姝ャ€?/div>
       </div>
       <div class="field">
-        <label>洛谷 Cookie（可选，仅用于同步做题记录）</label>
-        <input type="password" id="lgCookie" placeholder="登录 luogu.com.cn 后从浏览器开发者工具复制">
+        <label>娲涜胺 Cookie锛堝彲閫夛紝浠呯敤浜庡悓姝ュ仛棰樿褰曪級</label>
+        <input type="password" id="lgCookie" placeholder="鐧诲綍 luogu.com.cn 鍚庝粠娴忚鍣ㄥ紑鍙戣€呭伐鍏峰鍒?>
         <div class="row mt">
-          <button class="btn sm" id="btnSaveCookie">保存 Cookie</button>
-          <span class="muted small">Cookie 只保存在本地数据库，不外传。</span>
+          <button class="btn sm" id="btnSaveCookie">淇濆瓨 Cookie</button>
+          <span class="muted small">Cookie 鍙繚瀛樺湪鏈湴鏁版嵁搴擄紝涓嶅浼犮€?/span>
         </div>
         <details class="mt small muted" style="border:1px solid var(--border);border-radius:6px;padding:6px 10px">
-          <summary style="cursor:pointer">如何获取洛谷 Cookie（Chrome / Edge）</summary>
+          <summary style="cursor:pointer">濡備綍鑾峰彇娲涜胺 Cookie锛圕hrome / Edge锛?/summary>
           <ol style="margin:6px 0 0 0;padding-left:20px;line-height:1.8">
-            <li>浏览器打开 <a href="https://www.luogu.com.cn/" target="_blank">luogu.com.cn</a> 并登录账号；</li>
-            <li>按 <b>F12</b> → 切到 <b>Network / 网络</b> 标签 → 刷新页面（F5）；</li>
-            <li>点列表里任意一条请求 → 右侧 <b>Headers / 标头</b> → 找 <b>Request Headers / 请求标头</b> 里的 <code>Cookie:</code> 那一行；</li>
-            <li>复制 <code>Cookie:</code> 冒号后面的<b>整段</b>（形如 <code>__client_id=...; _uid=...; C3VK=...</code>），粘贴到上方输入框。只复制一条 Cookie 不够，必须整段。</li>
+            <li>娴忚鍣ㄦ墦寮€ <a href="https://www.luogu.com.cn/" target="_blank">luogu.com.cn</a> 骞剁櫥褰曡处鍙凤紱</li>
+            <li>鎸?<b>F12</b> 鈫?鍒囧埌 <b>Network / 缃戠粶</b> 鏍囩 鈫?鍒锋柊椤甸潰锛團5锛夛紱</li>
+            <li>鐐瑰垪琛ㄩ噷浠绘剰涓€鏉¤姹?鈫?鍙充晶 <b>Headers / 鏍囧ご</b> 鈫?鎵?<b>Request Headers / 璇锋眰鏍囧ご</b> 閲岀殑 <code>Cookie:</code> 閭ｄ竴琛岋紱</li>
+            <li>澶嶅埗 <code>Cookie:</code> 鍐掑彿鍚庨潰鐨?b>鏁存</b>锛堝舰濡?<code>__client_id=...; _uid=...; C3VK=...</code>锛夛紝绮樿创鍒颁笂鏂硅緭鍏ユ銆傚彧澶嶅埗涓€鏉?Cookie 涓嶅锛屽繀椤绘暣娈点€?/li>
           </ol>
         </details>
       </div>
@@ -96,38 +96,28 @@
   </div>
 
   <div class="card">
-    <h2>数据同步</h2>
+    <h2>鏁版嵁鍚屾</h2>
     <div id="syncBox"></div>
   </div>
 
   <div class="card">
-    <h2>洛谷题库导入</h2>
-    <div class="muted small mb">按洛谷官方难度档抓取（与题目列表页筛选一致：入门 / 普及− / 普及 / 普及+/提高 / 提高 / 提高+/省选− / 省选/NOI−）。每档等距抽 8 页，单线程 1.2 秒一个请求；入库按难度档增量替换，抓新档不会清掉旧档。题目难度统一折算为练习分（悬停可看真实档位），用于与 CF / AtCoder 题统一排计划。</div>
+    <h2>娲涜胺棰樺簱瀵煎叆</h2>
+    <div class="muted small mb">鎸夋礇璋峰畼鏂归毦搴︽。鎶撳彇锛堜笌棰樼洰鍒楄〃椤电瓫閫変竴鑷达細鍏ラ棬 / 鏅強鈭?/ 鏅強 / 鏅強+/鎻愰珮 / 鎻愰珮 / 鎻愰珮+/鐪侀€夆垝 / 鐪侀€?NOI鈭掞級銆傛瘡妗ｇ瓑璺濇娊 8 椤碉紝鍗曠嚎绋?1.2 绉掍竴涓姹傦紱鍏ュ簱鎸夐毦搴︽。澧為噺鏇挎崲锛屾姄鏂版。涓嶄細娓呮帀鏃ф。銆傞鐩毦搴︾粺涓€鎶樼畻涓虹粌涔犲垎锛堟偓鍋滃彲鐪嬬湡瀹炴。浣嶏級锛岀敤浜庝笌 CF / AtCoder 棰樼粺涓€鎺掕鍒掋€?/div>
     <div id="luoguTiers"></div>
     <div class="small muted mt" id="luoguStatus"></div>
   </div>
 
   <div class="card">
-    <h2>训练推荐模型（可选）</h2>
-    <div id="modelBox"></div>
-    <div class="row mt">
-      <input type="number" id="trainContests" value="60" min="5" max="300" style="width:110px">
-      <button class="btn" id="btnTrain">开始训练（采集 N 场）</button>
-      <span class="muted small">每场 2 个请求、按 2 秒间隔，60 场约 4 分钟。样本存入本地 SQLite，可重复增量采集。</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>数据与迁移</h2>
+    <h2>鏁版嵁涓庤縼绉?/h2>
     <div class="muted small">
-      所有账号设置、同步结果、训练记录、题单、比赛与复盘都保存在本地数据目录。<br>
-      备份 / 迁移：先退出本程序，再复制整个 <code id="dataDir"></code> 目录。<br>
-      Cookie / Session 等价于登录凭据，导出数据库或日志时请注意脱敏。
-    </div>
+      鎵€鏈夎处鍙疯缃€佸悓姝ョ粨鏋溿€佽缁冭褰曘€侀鍗曘€佹瘮璧涗笌澶嶇洏閮戒繚瀛樺湪鏈湴鏁版嵁鐩綍銆?br>
+      澶囦唤 / 杩佺Щ锛氬厛閫€鍑烘湰绋嬪簭锛屽啀澶嶅埗鏁翠釜 <code id="dataDir"></code> 鐩綍銆?br>
+      Cookie / Session 绛変环浜庣櫥褰曞嚟鎹紝瀵煎嚭鏁版嵁搴撴垨鏃ュ織鏃惰娉ㄦ剰鑴辨晱銆?    </div>
   </div>
 </div>
 
-<script src="/js/common.js?v=2"></script>
-<script src="/js/settings.js?v=2"></script>
+<script src="/js/common.js?v=3"></script>
+<script src="/js/settings.js?v=3"></script>
 </body>
 </html>
+
