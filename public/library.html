@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCPC 训练台 · 题库</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">XCPC<b>训练台</b></span>
+  <nav class="nav"></nav>
+  <span class="spacer"></span>
+  <select id="themeSel" style="width:96px">
+    <option value="dark">暗色</option><option value="light">亮色</option>
+    <option value="gray">灰色</option><option value="eye">护眼</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="row">
+      <button class="btn sm" id="tabBrowse" data-tab="browse">浏览题库</button>
+      <button class="btn sm" id="tabLists" data-tab="lists">我的题单</button>
+      <span class="spacer" style="flex:1"></span>
+      <span class="muted small" id="libNote"></span>
+    </div>
+  </div>
+
+  <div id="tab-browse">
+    <div class="card">
+      <div class="row">
+        <select id="fPlatform">
+          <option value="all">全部平台</option>
+          <option value="codeforces">Codeforces</option>
+          <option value="atcoder">AtCoder</option>
+          <option value="luogu">洛谷</option>
+        </select>
+        <input type="number" id="fMin" placeholder="难度 ≥" style="width:90px">
+        <input type="number" id="fMax" placeholder="难度 ≤" style="width:90px">
+        <input type="text" id="fTag" placeholder="标签关键词（如 dp / graph）" style="width:190px">
+        <input type="text" id="fQ" placeholder="题号或标题" style="width:170px">
+        <select id="fSort">
+          <option value="rating_desc">难度从高到低</option>
+          <option value="rating_asc">难度从低到高</option>
+          <option value="solved">按通过人数</option>
+        </select>
+        <label style="display:flex;gap:5px;align-items:center;color:var(--text)"><input type="checkbox" id="fUnsolved"> 只看未做</label>
+        <button class="btn primary" id="btnFilter">筛选</button>
+        <button class="btn" id="btnRandom">随机来一道</button>
+      </div>
+      <div class="muted small mt">题库为本地缓存（Codeforces 约 1.1 万题 + AtCoder 约 1 万题 + 抓取的洛谷题）。洛谷题可在「设置」里按难度档导入。</div>
+    </div>
+    <div class="card">
+      <div id="probTable"></div>
+      <div class="row mt">
+        <button class="btn sm" id="btnPrev">上一页</button>
+        <span class="muted small" id="pageInfo"></span>
+        <button class="btn sm" id="btnNext">下一页</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-lists" style="display:none">
+    <div class="card">
+      <div class="row">
+        <input type="text" id="listName" placeholder="题单名称" style="width:200px">
+        <button class="btn" id="btnCreateList">新建空题单</button>
+        <span class="muted small">或：</span>
+        <input type="text" id="importText" placeholder="粘贴一段带题号/链接的文本（支持 CF / AtCoder / 洛谷）" style="flex:1;min-width:280px">
+        <button class="btn primary" id="btnImport">导入为题单</button>
+      </div>
+      <div class="muted small mt">识别规则：codeforces.com/problemset/problem/1234A、atcoder.jp/contests/abc123/tasks/abc123_a、luogu.com.cn/problem/P1000，也支持裸题号 1234A / abc123_a / P1000。</div>
+    </div>
+    <div id="listsBox"></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/library.js"></script>
+</body>
+</html>

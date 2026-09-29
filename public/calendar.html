@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCPC 训练台 · 比赛与虚拟赛</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">XCPC<b>训练台</b></span>
+  <nav class="nav"></nav>
+  <span class="spacer"></span>
+  <select id="themeSel" style="width:96px">
+    <option value="dark">暗色</option><option value="light">亮色</option>
+    <option value="gray">灰色</option><option value="eye">护眼</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">比赛日历（未来 14 天）</h2>
+      <select id="calPlat">
+        <option value="all">全部</option><option value="codeforces">Codeforces</option>
+        <option value="atcoder">AtCoder</option>
+      </select>
+    </div>
+    <div class="mt" id="calBox"></div>
+    <div class="muted small mt">适合度按你的当前 rating 标注：题目难度落在练习区间 → 正合适；低于 → 偏简单；高于 → 偏难。</div>
+  </div>
+
+  <div class="card vp-panel">
+    <h2>虚拟参赛</h2>
+    <div class="muted small mb">从已结束的比赛里挑适合你的场次，本地计时。做题仍在原 OJ 提交；结束后按「比赛 + 时间窗口 + 提交记录」复盘，不依赖你是否在平台上注册了虚拟赛。</div>
+    <div class="grid cols-2">
+      <div>
+        <h3>推荐场次（近 6 个月）</h3>
+        <div id="vpRec"></div>
+      </div>
+      <div>
+        <h3>当前会话</h3>
+        <div id="vpActive"></div>
+      </div>
+    </div>
+    <h3 class="mt">历史会话</h3>
+    <div id="vpHistory"></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/calendar.js"></script>
+</body>
+</html>

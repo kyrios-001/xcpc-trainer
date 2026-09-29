@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCPC 训练台 · 总览</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">XCPC<b>训练台</b></span>
+  <nav class="nav"></nav>
+  <span class="spacer"></span>
+  <span class="hint">数据全部保存在本地 · 复制 data/xcpc.db 即可备份</span>
+  <select id="themeSel" style="width:96px">
+    <option value="dark">暗色</option><option value="light">亮色</option>
+    <option value="gray">灰色</option><option value="eye">护眼</option>
+  </select>
+</div>
+
+<div class="container">
+  <div id="flash"></div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">生涯总览</h2>
+      <div class="row">
+        <button class="btn sm" id="btnSyncAll">同步全部账号</button>
+        <span class="muted small" id="syncHint"></span>
+      </div>
+    </div>
+    <div class="stat-grid mt" id="statGrid"></div>
+    <div class="row mt small muted" id="statNotes"></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">活动砖</h2>
+        <div class="row">
+          <select id="actRange"><option value="365">最近 365 天</option><option value="year">今年</option></select>
+          <select id="actMode">
+            <option value="first-ac">首次 AC</option><option value="unique-ac">每日去重 AC</option>
+            <option value="ac-sub">AC 提交数</option><option value="activity">平台活动</option>
+          </select>
+          <button class="btn sm" id="btnExportPng">导出 PNG</button>
+        </div>
+      </div>
+      <div class="mt" id="heatWrap"></div>
+      <div class="heat-legend">
+        <span>少</span>
+        <i></i><i></i><i></i><i></i><i></i>
+        <span>多</span>
+        <span class="muted" style="margin-left:12px" id="heatSummary"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Rating 曲线</h2>
+        <select id="ratingPlat">
+          <option value="codeforces">Codeforces</option><option value="atcoder">AtCoder</option>
+        </select>
+      </div>
+      <div class="chart mt" id="ratingChart"></div>
+      <div class="muted small" id="ratingEmpty"></div>
+    </div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">难度足迹</h2>
+        <select id="diffPlat">
+          <option value="codeforces">Codeforces</option><option value="atcoder">AtCoder</option>
+          <option value="luogu">洛谷</option>
+        </select>
+      </div>
+      <div class="bar-chart mt" id="diffChart"></div>
+      <div class="muted small mt">各平台保留自己的难度体系，不做跨平台换算；无法确认难度的题目归入「未评级」。</div>
+    </div>
+
+    <div class="card">
+      <h2>近期 AC</h2>
+      <div id="recentList"></div>
+      <div class="muted small mt" id="recentNote"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>数据源状态</h2>
+    <div id="sourceStatus"></div>
+    <div class="muted small mt">同一平台在不同时间可取得的数据粒度可能不同（上游接口可能调整），同步失败只更新错误状态，已缓存数据仍可查看。</div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

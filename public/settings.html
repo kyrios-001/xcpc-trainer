@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCPC 训练台 · 设置</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">XCPC<b>训练台</b></span>
+  <nav class="nav"></nav>
+  <span class="spacer"></span>
+  <select id="themeSel" style="width:96px">
+    <option value="dark">暗色</option><option value="light">亮色</option>
+    <option value="gray">灰色</option><option value="eye">护眼</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h2>账号与凭据</h2>
+    <div class="grid cols-2">
+      <div class="field">
+        <label>Codeforces Handle</label>
+        <div class="row"><input type="text" id="cfHandle" placeholder="如 tourist" style="flex:1">
+          <button class="btn primary sm" id="btnSaveCf">保存</button></div>
+        <div class="small muted mt">无需 Cookie，可获取逐题 AC、难度与 Rating。</div>
+      </div>
+      <div class="field">
+        <label>AtCoder 用户名</label>
+        <div class="row"><input type="text" id="acHandle" placeholder="如 chokudai" style="flex:1">
+          <button class="btn primary sm" id="btnSaveAc">保存</button></div>
+        <div class="small muted mt">题目/难度来自 Kenkoooo 公开接口，无需登录。</div>
+      </div>
+      <div class="field">
+        <label>洛谷 UID（数字）</label>
+        <div class="row"><input type="text" id="lgUid" placeholder="如 123456" style="flex:1">
+          <button class="btn primary sm" id="btnSaveLg">保存</button></div>
+        <div class="small muted mt">做题记录需要登录 Cookie；无 Cookie 时只可导入题库。</div>
+      </div>
+      <div class="field">
+        <label>洛谷 Cookie（可选，仅用于同步做题记录）</label>
+        <input type="password" id="lgCookie" placeholder="登录 luogu.com.cn 后从浏览器开发者工具复制">
+        <div class="row mt">
+          <button class="btn sm" id="btnSaveCookie">保存 Cookie</button>
+          <span class="muted small">Cookie 只保存在本地数据库，不外传。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>数据同步</h2>
+    <div id="syncBox"></div>
+    <div class="row mt">
+      <button class="btn danger" id="btnClearAll">清空所有同步数据（保留账号设置）</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>洛谷题库导入</h2>
+    <div class="muted small mb">按难度档等距抽页抓取（每档 8 页 ≈ 400 题），单线程 1.2 秒一个请求。入库按难度档增量替换，抓新档不会清掉旧档。</div>
+    <div id="luoguTiers"></div>
+    <div class="small muted mt" id="luoguStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2>训练推荐模型（可选）</h2>
+    <div id="modelBox"></div>
+    <div class="row mt">
+      <input type="number" id="trainContests" value="60" min="5" max="300" style="width:110px">
+      <button class="btn" id="btnTrain">开始训练（采集 N 场）</button>
+      <span class="muted small">每场 2 个请求、按 2 秒间隔，60 场约 4 分钟。样本存入本地 SQLite，可重复增量采集。</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>数据与迁移</h2>
+    <div class="muted small">
+      所有账号设置、同步结果、训练记录、题单、比赛与复盘都保存在本地数据目录。<br>
+      备份 / 迁移：先退出本程序，再复制整个 <code id="dataDir"></code> 目录。<br>
+      Cookie / Session 等价于登录凭据，导出数据库或日志时请注意脱敏。
+    </div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/settings.js"></script>
+</body>
+</html>

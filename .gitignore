@@ -1,0 +1,13 @@
+# 本地数据（含账号 Cookie / Session 等登录凭据，切勿上传）
+data/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# Node 依赖与构建产物（本项目零依赖，规则保留备用）
+node_modules/
+dist/

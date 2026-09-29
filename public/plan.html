@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XCPC 训练台 · 训练计划</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">XCPC<b>训练台</b></span>
+  <nav class="nav"></nav>
+  <span class="spacer"></span>
+  <select id="themeSel" style="width:96px">
+    <option value="dark">暗色</option><option value="light">亮色</option>
+    <option value="gray">灰色</option><option value="eye">护眼</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>计划配置</h2>
+      <div class="grid cols-2">
+        <div class="field"><label>目标 Rating</label><input type="number" id="pTarget" min="1000" max="4000" step="100"></div>
+        <div class="field"><label>每周题量</label><input type="number" id="pWeekly" min="1" max="84"></div>
+      </div>
+      <div class="field">
+        <label>每周固定休息日（这些天不排题）</label>
+        <div class="row" id="restDays"></div>
+      </div>
+      <div class="field">
+        <label>题目来源</label>
+        <div class="row">
+          <label style="display:flex;gap:6px;align-items:center;color:var(--text)"><input type="checkbox" id="pMixAc"> 混入 AtCoder 题（1/4）</label>
+          <label style="display:flex;gap:6px;align-items:center;color:var(--text)"><input type="checkbox" id="pMixLg"> 混入洛谷题（1/4）</label>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="btnGen">生成训练计划</button>
+        <button class="btn" id="btnRegen">仅重新排程</button>
+        <span class="muted small" id="planStatus"></span>
+      </div>
+      <div class="muted small mt">题量估算：每提升 100 分约 60 题；每阶段练习区间 = 阶段目标分 -250 ~ +150。AtCoder/洛谷每天最多一题，CF 每天最多 ceil(周题量/3)。</div>
+    </div>
+
+    <div class="card">
+      <h2>能力画像（八方向）</h2>
+      <div id="capBox"></div>
+      <div class="muted small mt">
+        方向水平用 75 分位代表（非最高难度）；置信度随样本量提升（50 题封顶）。
+        弱项指数 0~100：练习区间下沿以下 = 100，区间中心 = 0。未接触方向单独标出，最该优先补。
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">训练日程</h2>
+      <div class="row">
+        <button class="btn sm" id="btnPrev">← 上周</button>
+        <span class="muted small" id="weekLabel"></span>
+        <button class="btn sm" id="btnNext">下周 →</button>
+        <button class="btn sm" id="btnToday">回到本周</button>
+      </div>
+    </div>
+    <div class="muted small mb">点日期卡片上的「忙」可标记当天没空（题会自动顺延，总题量不变）。</div>
+    <div class="grid cols-7" id="weekGrid" style="grid-template-columns:repeat(7,1fr);min-width:980px;overflow-x:auto"></div>
+  </div>
+
+  <div class="card">
+    <h2>阶段概览</h2>
+    <div id="stageBox"></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/plan.js"></script>
+</body>
+</html>

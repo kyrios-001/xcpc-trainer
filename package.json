@@ -1,0 +1,16 @@
+{
+  "name": "xcpc-trainer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "XCPC 训练辅助软件：多平台训练数据面板 + 分阶段训练计划 + 虚拟参赛与复盘 + ICPC/CCPC 补题追踪",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning --experimental-sqlite server.js",
+    "sync": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/sync-problems.js",
+    "train": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/train-model.js",
+    "smoke": "node --disable-warning=ExperimentalWarning --experimental-sqlite scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
