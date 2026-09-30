@@ -18,10 +18,6 @@ async function init() {
   if (s.luogu_cookie_set) $('lgCookie').value = '（已保存）';
   const lcUser = s.platforms.leetcode && s.platforms.leetcode[0];
   if (lcUser) $('lcHandle').value = lcUser.handle;
-  for (const [pf, id] of [['hdu','hduHandle'],['poj','pojHandle'],['vjudge','vjHandle'],['nowcoder','ncUid'],['qoj','qojHandle']]) {
-    const u = s.platforms[pf] && s.platforms[pf][0];
-    if (u) $(id).value = u.handle;
-  }
 
   $('btnSaveCf').addEventListener('click', async () => {
     await api('/settings', { method: 'POST', body: { cf_handle: $('cfHandle').value.trim() } });
@@ -52,7 +48,7 @@ async function init() {
   document.querySelectorAll('[data-save]').forEach((b) => b.addEventListener('click', async () => {
     const [pf, inputId] = b.dataset.save.split(':');
     const v = $(inputId).value.trim();
-    const fieldMap = { hdu: 'hdu_handle', poj: 'poj_handle', vjudge: 'vj_handle', nowcoder: 'nc_uid', qoj: 'qoj_handle' };
+    const fieldMap = {};
     await api('/settings', { method: 'POST', body: { [fieldMap[pf]]: v } });
     flash(v ? PLATFORM[pf].name + ' 账号已保存' : PLATFORM[pf].name + ' 账号已删除');
     await loadSync();
