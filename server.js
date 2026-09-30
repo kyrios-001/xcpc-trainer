@@ -244,7 +244,7 @@ function queryProblems(q) {
 
   // 已做集合
   const done = new Set();
-  for (const r of dbm.db.prepare("SELECT platform, pid FROM submissions WHERE verdict = 'OK'").all()) done.add(`${r.platform}:${r.pid}`);
+  for (const r of dbm.db.prepare("SELECT platform, pid FROM submissions WHERE verdict IN ('OK','AC')").all()) done.add(`${r.platform}:${r.pid}`);
   for (const r of dbm.db.prepare("SELECT platform, pid FROM solved_marks WHERE user = ?").all(USER)) done.add(`${r.platform}:${r.pid}`);
   const items = rows.map((r) => {
     const tags = JSON.parse(r.tags || '[]');
@@ -571,7 +571,7 @@ const server = http.createServer(async (req, res) => {
 
     if (p === '/api/lists' && req.method === 'GET') {
       const doneSet = new Set();
-      for (const r of dbm.db.prepare("SELECT platform, pid FROM submissions WHERE verdict = 'OK'").all()) doneSet.add(r.platform + ':' + r.pid);
+      for (const r of dbm.db.prepare("SELECT platform, pid FROM submissions WHERE verdict IN ('OK','AC')").all()) doneSet.add(r.platform + ':' + r.pid);
       for (const r of dbm.db.prepare("SELECT platform, pid FROM solved_marks WHERE user = ?").all(USER)) doneSet.add(r.platform + ':' + r.pid);
       const rows = dbm.db.prepare('SELECT * FROM lists WHERE user = ? ORDER BY id DESC').all(USER);
       const result = rows.map(function(r) {
