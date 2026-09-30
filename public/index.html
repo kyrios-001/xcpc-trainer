@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>XCPC 训练台 · 总览</title>
-<link rel="stylesheet" href="/css/style.css?v=4">
+<link rel="stylesheet" href="/css/style.css?v=5">
 </head>
 <body>
 <div class="topbar">
@@ -77,14 +77,8 @@
 
   <div class="grid cols-2">
     <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">难度足迹</h2>
-        <select id="diffPlat">
-          <option value="codeforces">Codeforces</option><option value="atcoder">AtCoder</option>
-          <option value="luogu">洛谷</option>
-        </select>
-      </div>
-      <div class="bar-chart mt" id="diffChart"></div>
+      <h2 style="margin:0">难度足迹</h2>
+      <div id="diffAll" class="mt"></div>
       <div class="muted small mt">各平台保留自己的难度体系，不做跨平台换算；无法确认难度的题目归入「未评级」。</div>
     </div>
 
@@ -102,7 +96,7 @@
   </div>
 </div>
 
-<script src="/js/common.js?v=4"></script>
-<script src="/js/dashboard.js?v=4"></script>
+<script src="/js/common.js?v=5"></script>
+<script src="/js/dashboard.js?v=5"></script>
 </body>
 </html>

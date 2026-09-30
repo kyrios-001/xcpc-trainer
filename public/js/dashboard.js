@@ -29,7 +29,6 @@ async function init() {
   $('actMode').addEventListener('change', loadActivity);
   $('btnExportPng').addEventListener('click', exportHeatPng);
   $('ratingPlat').addEventListener('change', loadRating);
-  $('diffPlat').addEventListener('change', loadDifficulty);
 
   await loadAll();
   await loadToday();
@@ -172,7 +171,7 @@ async function loadRating() {
     return;
   }
   empty.textContent = '';
-  const W = 1000, H = 260, ml = 46, mr = 14, mt = 12, mb = 28;
+  const W = 1000, H = 340, ml = 50, mr = 16, mt = 16, mb = 36;
   const ratings = data.map((d) => d.new_rating);
   const min = Math.min(...ratings) - 50, max = Math.max(...ratings) + 50;
   const X = (i) => ml + (i / Math.max(1, data.length - 1)) * (W - ml - mr);
@@ -199,15 +198,26 @@ async function loadRating() {
   </svg>`;
 }
 
-// ---------- 难度足迹 ----------
+// ---------- 难度足迹（所有平台并排） ----------
 async function loadDifficulty() {
-  const pf = $('diffPlat').value;
-  const data = await api(`/difficulty?platform=${pf}`);
-  const box = $('diffChart');
-  if (!data.length) { box.innerHTML = '<div class="muted small">暂无数据（同步后显示）。</div>'; return; }
-  const max = Math.max(...data.map((d) => d[1]));
-  box.innerHTML = `<div class="bar-chart">${data.map(([k, v]) =>
-    `<div class="bar"><span>${v}</span><i style="height:${Math.max(3, (v / max) * 100)}%"></i><span style="font-size:10px">${esc(k)}</span></div>`).join('')}</div>`;
+  const box = $('diffAll');
+  const plats = ['codeforces', 'atcoder', 'luogu'];
+  const names = { codeforces: 'Codeforces', atcoder: 'AtCoder', luogu: '洛谷' };
+  const colors = { codeforces: '#4a90d9', atcoder: '#e07040', luogu: '#6aa84f' };
+  let html = '';
+  for (const pf of plats) {
+    try {
+      const data = await api(`/difficulty?platform=${pf}`, { silent: true });
+      if (!data.length) continue;
+      const max = Math.max(...data.map((d) => d[1]));
+      html += `<div style="margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;color:${colors[pf]};margin-bottom:6px">${names[pf]}</div>
+        <div class="bar-chart" style="height:140px">${data.map(([k, v]) =>
+          `<div class="bar"><span style="font-size:11px">${v}</span><i style="height:${Math.max(3, (v / max) * 100)}%;background:${colors[pf]}"></i><span style="font-size:10px">${esc(k)}</span></div>`).join('')}</div>
+      </div>`;
+    } catch {}
+  }
+  box.innerHTML = html || '<div class="muted small">暂无数据（同步后显示）。</div>';
 }
 
 // ---------- 近期 AC ----------
