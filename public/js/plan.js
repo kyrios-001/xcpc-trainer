@@ -3,6 +3,7 @@
 
 const $ = (id) => document.getElementById(id);
 let planData = null, weekOffset = 0, busyMap = new Map();
+let restSel = null;
 const DAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
 async function init() {
@@ -14,7 +15,7 @@ async function init() {
   });
 
   // 休息日选择
-  const restSel = $('restDays');
+  restSel = $('restDays');
   restSel.innerHTML = DAY_NAMES.map((n, i) =>
     `<label style="display:flex;gap:5px;align-items:center;color:var(--text)"><input type="checkbox" value="${i}"> ${n}</label>`).join('');
   for (const d of s.planDefaults.restDays) {

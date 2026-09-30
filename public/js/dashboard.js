@@ -180,13 +180,13 @@ async function loadRating() {
   const area = path + ` L${X(data.length - 1)},${H - mb} L${X(0)},${H - mb} Z`;
   const grid = [0.25, 0.5, 0.75].map((f) => {
     const y = mt + (1 - f) * (H - mt - mb);
-    return `<line class="gridline" x1="${ml}" y1="${y}" x2="${W - mr}" y2="${y}"></line><text x="${ml - 6}" y="${y + 4}" text-anchor="end">${Math.round(min + f * (max - min))}</text>`;
+    return `<line class="gridline" x1="${ml}" y1="${y}" x2="${W - mr}" y2="${y}"></line><text x="${ml - 6}" y="${y + 4}" text-anchor="end" font-size="14">${Math.round(min + f * (max - min))}</text>`;
   }).join('');
   const labels = [];
   const step = Math.max(1, Math.floor(data.length / 8));
   for (let i = 0; i < data.length; i += step) {
     const d = new Date(data[i].ts * 1000);
-    labels.push(`<text x="${X(i)}" y="${H - 8}" text-anchor="middle">${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}</text>`);
+    labels.push(`<text x="${X(i)}" y="${H - 8}" text-anchor="middle" font-size="14">${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}</text>`);
   }
   const dots = data.map((d, i) => `<circle class="dot" cx="${X(i)}" cy="${Y(d.new_rating)}" r="2.5"><title>${esc(d.contest_name)}: ${d.old_rating}→${d.new_rating}</title></circle>`).join('');
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
