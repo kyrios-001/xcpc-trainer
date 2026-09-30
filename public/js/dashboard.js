@@ -212,7 +212,7 @@ async function loadDifficulty() {
       const max = Math.max(...data.map((d) => d[1]));
       html += `<div style="margin-bottom:16px">
         <div style="font-size:13px;font-weight:600;color:${colors[pf]};margin-bottom:6px">${names[pf]}</div>
-        <div class="bar-chart" style="height:120px">${data.map(([k, v]) =>
+        <div class="bar-chart" style="height:100px">${data.map(([k, v]) =>
           `<div class="bar"><span style="font-size:11px">${v}</span><i style="height:${Math.max(3, (v / max) * 100)}%;background:${colors[pf]}"></i><span style="font-size:10px">${esc(k)}</span></div>`).join('')}</div>
       </div>`;
     } catch {}
