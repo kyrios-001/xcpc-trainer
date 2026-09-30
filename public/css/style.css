@@ -213,3 +213,5 @@ td .small { white-space: normal; }
 .skill-bar .meta { white-space: nowrap; }
 /* 日期列不换行 */
 td:first-child { white-space: nowrap; }
+
+.library-table .btn { white-space: nowrap; }
