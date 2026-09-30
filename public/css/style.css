@@ -135,7 +135,7 @@ label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px
 .heat-legend i:nth-child(6) { background: var(--heat4); }
 
 /* ---- Rating 曲线 / 条形图（SVG） ---- */
-.chart { width: 100%; height: 340px; }
+.chart { width: 100%; height: 320px; }
 .chart svg { width: 100%; height: 100%; }
 .chart .axis { stroke: var(--border); }
 .chart .gridline { stroke: var(--border); stroke-dasharray: 3 3; opacity: .5; }

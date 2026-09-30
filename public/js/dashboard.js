@@ -171,7 +171,7 @@ async function loadRating() {
     return;
   }
   empty.textContent = '';
-  const W = 1000, H = 340, ml = 50, mr = 16, mt = 16, mb = 36;
+  const W = 1400, H = 320, ml = 56, mr = 20, mt = 16, mb = 36;
   const ratings = data.map((d) => d.new_rating);
   const min = Math.min(...ratings) - 50, max = Math.max(...ratings) + 50;
   const X = (i) => ml + (i / Math.max(1, data.length - 1)) * (W - ml - mr);
@@ -179,7 +179,7 @@ async function loadRating() {
   const path = data.map((d, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(d.new_rating).toFixed(1)}`).join(' ');
   const area = path + ` L${X(data.length - 1)},${H - mb} L${X(0)},${H - mb} Z`;
   const grid = [0.25, 0.5, 0.75].map((f) => {
-    const y = mt + f * (H - mt - mb);
+    const y = mt + (1 - f) * (H - mt - mb);
     return `<line class="gridline" x1="${ml}" y1="${y}" x2="${W - mr}" y2="${y}"></line><text x="${ml - 6}" y="${y + 4}" text-anchor="end">${Math.round(min + f * (max - min))}</text>`;
   }).join('');
   const labels = [];
@@ -212,7 +212,7 @@ async function loadDifficulty() {
       const max = Math.max(...data.map((d) => d[1]));
       html += `<div style="margin-bottom:16px">
         <div style="font-size:13px;font-weight:600;color:${colors[pf]};margin-bottom:6px">${names[pf]}</div>
-        <div class="bar-chart" style="height:140px">${data.map(([k, v]) =>
+        <div class="bar-chart" style="height:120px">${data.map(([k, v]) =>
           `<div class="bar"><span style="font-size:11px">${v}</span><i style="height:${Math.max(3, (v / max) * 100)}%;background:${colors[pf]}"></i><span style="font-size:10px">${esc(k)}</span></div>`).join('')}</div>
       </div>`;
     } catch {}

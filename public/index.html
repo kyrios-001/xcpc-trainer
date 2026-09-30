@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>XCPC 训练台 · 总览</title>
-<link rel="stylesheet" href="/css/style.css?v=5">
+<link rel="stylesheet" href="/css/style.css?v=6">
 </head>
 <body>
 <div class="topbar">
@@ -41,52 +41,48 @@
     <div id="todayList" class="mt"></div>
   </div>
 
-  <div class="grid cols-2">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">活动砖</h2>
-        <div class="row">
-          <select id="actRange"><option value="365">最近 365 天</option><option value="year">今年</option></select>
-          <select id="actMode">
-            <option value="first-ac">首次 AC</option><option value="unique-ac">每日去重 AC</option>
-            <option value="ac-sub">AC 提交数</option><option value="activity">平台活动</option>
-          </select>
-          <button class="btn sm" id="btnExportPng">导出 PNG</button>
-        </div>
-      </div>
-      <div class="mt" id="heatWrap"></div>
-      <div class="heat-legend">
-        <span>少</span>
-        <i></i><i></i><i></i><i></i><i></i>
-        <span>多</span>
-        <span class="muted" style="margin-left:12px" id="heatSummary"></span>
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">活动砖</h2>
+      <div class="row">
+        <select id="actRange"><option value="365">最近 365 天</option><option value="year">今年</option></select>
+        <select id="actMode">
+          <option value="first-ac">首次 AC</option><option value="unique-ac">每日去重 AC</option>
+          <option value="ac-sub">AC 提交数</option><option value="activity">平台活动</option>
+        </select>
+        <button class="btn sm" id="btnExportPng">导出 PNG</button>
       </div>
     </div>
-
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">Rating 曲线</h2>
-        <select id="ratingPlat">
-          <option value="codeforces">Codeforces</option><option value="atcoder">AtCoder</option>
-        </select>
-      </div>
-      <div class="chart mt" id="ratingChart"></div>
-      <div class="muted small" id="ratingEmpty"></div>
+    <div class="mt" id="heatWrap"></div>
+    <div class="heat-legend">
+      <span>少</span>
+      <i></i><i></i><i></i><i></i><i></i>
+      <span>多</span>
+      <span class="muted" style="margin-left:12px" id="heatSummary"></span>
     </div>
   </div>
 
-  <div class="grid cols-2">
-    <div class="card">
-      <h2 style="margin:0">难度足迹</h2>
-      <div id="diffAll" class="mt"></div>
-      <div class="muted small mt">各平台保留自己的难度体系，不做跨平台换算；无法确认难度的题目归入「未评级」。</div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">Rating 曲线</h2>
+      <select id="ratingPlat">
+        <option value="codeforces">Codeforces</option><option value="atcoder">AtCoder</option>
+      </select>
     </div>
+    <div class="chart mt" id="ratingChart"></div>
+    <div class="muted small" id="ratingEmpty"></div>
+  </div>
 
-    <div class="card">
-      <h2>近期 AC</h2>
-      <div id="recentList"></div>
-      <div class="muted small mt" id="recentNote"></div>
-    </div>
+  <div class="card">
+    <h2 style="margin:0">难度足迹</h2>
+    <div id="diffAll" class="mt"></div>
+    <div class="muted small mt">各平台保留自己的难度体系，不做跨平台换算；无法确认难度的题目归入「未评级」。</div>
+  </div>
+
+  <div class="card">
+    <h2>近期 AC</h2>
+    <div id="recentList"></div>
+    <div class="muted small mt" id="recentNote"></div>
   </div>
 
   <div class="card">
@@ -96,7 +92,7 @@
   </div>
 </div>
 
-<script src="/js/common.js?v=5"></script>
-<script src="/js/dashboard.js?v=5"></script>
+<script src="/js/common.js?v=6"></script>
+<script src="/js/dashboard.js?v=6"></script>
 </body>
 </html>
