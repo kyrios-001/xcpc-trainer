@@ -41,11 +41,6 @@ const PLATFORM = {
   atcoder: { name: 'AtCoder', short: 'AC', color: '#d29922' },
   luogu: { name: '洛谷', short: '洛谷', color: '#3fb950' },
   leetcode: { name: 'LeetCode', short: 'LC', color: '#ffa116' },
-  hdu: { name: 'HDU 杭电', short: 'HDU', color: '#e34c26' },
-  poj: { name: 'POJ 北大', short: 'POJ', color: '#2980b9' },
-  vjudge: { name: 'VJudge', short: 'VJ', color: '#8e44ad' },
-  nowcoder: { name: '牛客', short: '牛客', color: '#00a6a0' },
-  qoj: { name: 'QOJ', short: 'QOJ', color: '#f39c12' },
 };
 
 function esc(s) {

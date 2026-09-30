@@ -14,7 +14,6 @@ const cf = require('./lib/cf');
 const ac = require('./lib/ac');
 const luogu = require('./lib/luogu');
 const leetcode = require('./lib/leetcode');
-const simpleOj = require('./lib/simple_oj');
 const plan = require('./lib/plan');
 const contests = require('./lib/contests');
 const icpc = require('./lib/icpc');
@@ -154,14 +153,6 @@ async function syncPlatform(platform, handle, mode) {
       });
       dbm.checkpoint();
       return { solved: r.solved, ranking: r.ranking };
-    }
-    if (simpleOj.handlers[platform]) {
-      const r = await simpleOj.handlers[platform](handle);
-      dbm.setSyncState(platform, handle, {
-        cursor: '', last_sync: Math.floor(Date.now() / 1000), status: 'ok', error: '',
-      });
-      dbm.checkpoint();
-      return r;
     }
     throw new Error('未知平台');
   } catch (e) {
