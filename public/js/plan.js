@@ -107,6 +107,24 @@ async function loadBusy() {
 async function loadPlan() {
   const r = await api('/plan');
   planData = { meta: typeof r.meta === 'string' ? JSON.parse(r.meta) : r.meta, items: r.items };
+  // 用实际计划的配置回填表单
+  const m = planData.meta;
+  if (m) {
+    if (m.target) $('pTarget').value = m.target;
+    if (m.weekly) $('pWeekly').value = m.weekly;
+    if (Array.isArray(m.restDays)) {
+      restSel.innerHTML = DAY_NAMES.map((n, i) =>
+        `<label style="display:flex;gap:5px;align-items:center;color:var(--text)"><input type="checkbox" value="${i}"> ${n}</label>`).join('');
+      for (const d of m.restDays) {
+        const cb = restSel.querySelector(`input[value="${d}"]`);
+        if (cb) cb.checked = true;
+      }
+    }
+    if (Array.isArray(m.mix)) {
+      $('pMixAc').checked = m.mix.some(x => x.platform === 'atcoder');
+      $('pMixLg').checked = m.mix.some(x => x.platform === 'luogu');
+    }
+  }
   renderWeek();
   renderStages();
 }

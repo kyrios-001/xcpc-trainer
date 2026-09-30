@@ -18,7 +18,7 @@
   --heat0:#23272c; --heat1:#4a5560; --heat2:#77838f; --heat3:#a8b4c0; --heat4:#d8e0e8;
 }
 :root[data-theme='eye'] {
-  --bg: #eef0e2; --panel: #f7f8ed; --panel2: #e6e8d6; --text: #2e3a28; --muted: #6b7561;
+  --bg: #e8ebd8; --panel: #f5f6e8; --panel2: #dde0c8; --text: #1f2a1a; --muted: #55604a;
   --border: #c9cdb8; --accent: #5a8f5a; --accent2: #3f6e3f; --ok: #3d7a3d; --warn: #9a7b2d;
   --danger: #a05a4d; --shadow: 0 4px 14px rgba(60,80,50,.14);
   --heat0:#e4e6d8; --heat1:#b7cf9c; --heat2:#8fbf70; --heat3:#6aa84f; --heat4:#4a8a35;
@@ -29,7 +29,6 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg); color: var(--text);
   font: 14px/1.6 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-  transition: background .25s, color .25s;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -41,7 +40,7 @@ code { background: var(--panel2); padding: 1px 5px; border-radius: 4px; font-siz
   padding: 10px 22px; background: var(--panel); border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 20;
 }
-.brand { font-size: 17px; font-weight: 700; letter-spacing: .5px; color: var(--text); }
+.brand { font-size: 17px; font-weight: 700; letter-spacing: .5px; color: var(--text); white-space: nowrap; flex-shrink: 0; }
 .brand b { color: var(--accent); }
 .nav { display: flex; gap: 4px; margin-left: 12px; flex-wrap: wrap; }
 .nav a {
@@ -94,7 +93,7 @@ tr:hover td { background: var(--panel2); }
 .btn.primary:hover { background: var(--accent2); color: #fff; }
 .btn.danger { color: var(--danger); }
 .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
-.btn.sm { padding: 4px 9px; font-size: 12.5px; border-radius: 6px; }
+.btn.sm { padding: 4px 9px; font-size: 12.5px; border-radius: 6px; white-space: nowrap; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 input[type=text], input[type=number], input[type=password], select, textarea {
   background: var(--bg); color: var(--text); border: 1px solid var(--border);
@@ -110,7 +109,7 @@ label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px
 .mt { margin-top: 10px; } .mb { margin-bottom: 10px; }
 
 /* ---- 徽章 ---- */
-.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
 .badge.ok { color: var(--ok); border-color: var(--ok); }
 .badge.warn { color: var(--warn); border-color: var(--warn); }
 .badge.danger { color: var(--danger); border-color: var(--danger); }
@@ -204,3 +203,5 @@ label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+.fit-badge { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; min-width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-size: 12px; font-weight: 600; text-align: center; }
