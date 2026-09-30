@@ -255,8 +255,4 @@ data/xcpc.db              你的所有数据（复制即备份，删除可重建
 
 
 
-* 统计口径与数据边界理念参考 [OJ Insight](https://github.com/Whalica/OJ_Insight)（MIT 协议）—— 多平台训练数据面板的思路；本项目未使用其代码。
-
-* 训练计划与虚拟参赛复盘的产品形态参考 [ACM Tracker](https://github.com/DB-SLSQ/Acm-Tracker)（README 公开信息）——「告诉你下一步练什么」的思路。
-
 * 题目难度数据来自 [Kenkoooo / AtCoder Problems](https://kenkoooo.com/atcoder/) 公开接口与 AtCoder 官方页面；Codeforces 数据来自官方 API（请求遵守 2 秒间隔与匿名限制）。
